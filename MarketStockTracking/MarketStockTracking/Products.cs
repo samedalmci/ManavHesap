@@ -65,5 +65,10 @@ namespace MarketStockTracking
                 conn.Close();
             }
         }
+
+        private void txtUrunAdi_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -43,6 +43,7 @@
             txtUrunAdi.Size = new Size(161, 23);
             txtUrunAdi.TabIndex = 2;
             txtUrunAdi.Text = "Ürün İsmi\r\n";
+            txtUrunAdi.TextChanged += txtUrunAdi_TextChanged;
             // 
             // txtUrunCesidi
             // 

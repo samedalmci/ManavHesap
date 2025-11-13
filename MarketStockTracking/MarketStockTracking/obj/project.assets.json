@@ -1739,11 +1739,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\tobil\\Desktop\\MarketStockTracking\\MarketStockTracking\\MarketStockTracking.csproj",
+      "projectUniqueName": "C:\\Users\\tobil\\OneDrive\\Masaüstü\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\MarketStockTracking.csproj",
       "projectName": "MarketStockTracking",
-      "projectPath": "C:\\Users\\tobil\\Desktop\\MarketStockTracking\\MarketStockTracking\\MarketStockTracking.csproj",
+      "projectPath": "C:\\Users\\tobil\\OneDrive\\Masaüstü\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\MarketStockTracking.csproj",
       "packagesPath": "C:\\Users\\tobil\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\tobil\\Desktop\\MarketStockTracking\\MarketStockTracking\\obj\\",
+      "outputPath": "C:\\Users\\tobil\\OneDrive\\Masaüstü\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\tobil\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -1806,7 +1806,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

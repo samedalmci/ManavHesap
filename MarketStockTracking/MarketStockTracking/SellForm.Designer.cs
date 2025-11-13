@@ -86,7 +86,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(332, 105);
+            label3.Location = new Point(204, 105);
             label3.Name = "label3";
             label3.Size = new Size(57, 15);
             label3.TabIndex = 6;
@@ -95,7 +95,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(332, 31);
+            label4.Location = new Point(204, 31);
             label4.Name = "label4";
             label4.Size = new Size(62, 15);
             label4.TabIndex = 7;
@@ -103,14 +103,15 @@
             // 
             // txtAdet
             // 
-            txtAdet.Location = new Point(204, 97);
+            txtAdet.Location = new Point(336, 89);
             txtAdet.Name = "txtAdet";
             txtAdet.Size = new Size(100, 23);
             txtAdet.TabIndex = 8;
+            txtAdet.TextChanged += txtAdet_TextChanged;
             // 
             // txtNet
             // 
-            txtNet.Location = new Point(332, 61);
+            txtNet.Location = new Point(204, 61);
             txtNet.Name = "txtNet";
             txtNet.Size = new Size(100, 23);
             txtNet.TabIndex = 9;
@@ -118,7 +119,7 @@
             // 
             // txtBrut
             // 
-            txtBrut.Location = new Point(332, 127);
+            txtBrut.Location = new Point(204, 127);
             txtBrut.Name = "txtBrut";
             txtBrut.Size = new Size(100, 23);
             txtBrut.TabIndex = 10;
@@ -127,7 +128,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(204, 70);
+            label5.Location = new Point(336, 61);
             label5.Name = "label5";
             label5.Size = new Size(32, 15);
             label5.TabIndex = 11;
@@ -137,7 +138,7 @@
             // 
             txtKarZarar.AutoSize = true;
             txtKarZarar.Font = new Font("Segoe UI", 20.25F, FontStyle.Regular, GraphicsUnit.Point, 162);
-            txtKarZarar.Location = new Point(479, 82);
+            txtKarZarar.Location = new Point(204, 194);
             txtKarZarar.Name = "txtKarZarar";
             txtKarZarar.Size = new Size(73, 37);
             txtKarZarar.TabIndex = 13;
@@ -145,7 +146,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(721, 48);
+            button1.Location = new Point(634, 48);
             button1.Name = "button1";
             button1.Size = new Size(112, 102);
             button1.TabIndex = 14;
@@ -156,31 +157,32 @@
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(479, 61);
+            label9.Location = new Point(204, 173);
             label9.Name = "label9";
             label9.Size = new Size(62, 15);
             label9.TabIndex = 16;
             label9.Text = "Kar - Zarar";
-            label9.Click += label9_Click;
             // 
             // txtPesin
             // 
-            txtPesin.Location = new Point(587, 61);
+            txtPesin.Location = new Point(482, 61);
             txtPesin.Name = "txtPesin";
             txtPesin.Size = new Size(100, 23);
             txtPesin.TabIndex = 17;
+            txtPesin.TextChanged += txtPesin_TextChanged;
             // 
             // txtBorc
             // 
-            txtBorc.Location = new Point(587, 127);
+            txtBorc.Location = new Point(482, 127);
             txtBorc.Name = "txtBorc";
             txtBorc.Size = new Size(100, 23);
             txtBorc.TabIndex = 18;
+            txtBorc.TextChanged += txtBorc_TextChanged;
             // 
             // label10
             // 
             label10.AutoSize = true;
-            label10.Location = new Point(587, 31);
+            label10.Location = new Point(482, 31);
             label10.Name = "label10";
             label10.Size = new Size(35, 15);
             label10.TabIndex = 19;
@@ -189,7 +191,7 @@
             // label11
             // 
             label11.AutoSize = true;
-            label11.Location = new Point(587, 105);
+            label11.Location = new Point(482, 105);
             label11.Name = "label11";
             label11.Size = new Size(31, 15);
             label11.TabIndex = 20;
@@ -202,14 +204,14 @@
             dgvUrunler.Location = new Point(43, 258);
             dgvUrunler.Name = "dgvUrunler";
             dgvUrunler.ReadOnly = true;
-            dgvUrunler.Size = new Size(790, 230);
+            dgvUrunler.Size = new Size(703, 230);
             dgvUrunler.TabIndex = 21;
             // 
             // SellForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(864, 518);
+            ClientSize = new Size(777, 518);
             Controls.Add(dgvUrunler);
             Controls.Add(label11);
             Controls.Add(label10);

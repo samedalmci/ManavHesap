@@ -62,8 +62,9 @@
             button2.Name = "button2";
             button2.Size = new Size(75, 23);
             button2.TabIndex = 2;
-            button2.Text = "Mağza";
+            button2.Text = "Marketler";
             button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
             // 
             // button1
             // 
