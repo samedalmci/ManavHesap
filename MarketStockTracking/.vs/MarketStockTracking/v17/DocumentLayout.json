@@ -7,28 +7,8 @@
       "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|c:\\users\\tobil\\onedrive\\masa\u00FCst\u00FC\\manavhesap\\marketstocktracking\\marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\marketstocktracking\\stores.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\stores.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\marketstocktracking\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|c:\\users\\tobil\\onedrive\\masa\u00FCst\u00FC\\manavhesap\\marketstocktracking\\marketstocktracking\\products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|c:\\users\\tobil\\onedrive\\masa\u00FCst\u00FC\\manavhesap\\marketstocktracking\\marketstocktracking\\products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|c:\\users\\tobil\\onedrive\\masa\u00FCst\u00FC\\manavhesap\\marketstocktracking\\marketstocktracking\\stores.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\stores.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -37,7 +17,7 @@
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedWidth": 463,
+          "DockedWidth": 320,
           "SelectedChildIndex": 0,
           "Children": [
             {
@@ -48,77 +28,15 @@
               "RelativeDocumentMoniker": "MarketStockTracking\\SellForm.cs",
               "ToolTip": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\SellForm.cs",
               "RelativeToolTip": "MarketStockTracking\\SellForm.cs",
-              "ViewState": "AgIAACkBAAAAAAAAAAAAwDYBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACkBAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-14T01:27:43.004Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Stores.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\Stores.cs",
-              "RelativeDocumentMoniker": "MarketStockTracking\\Stores.cs",
-              "ToolTip": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\Stores.cs [Design]",
-              "RelativeToolTip": "MarketStockTracking\\Stores.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-13T23:11:27.95Z",
-              "EditorCaption": " [Design]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Form1.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\Form1.cs",
-              "RelativeDocumentMoniker": "MarketStockTracking\\Form1.cs",
-              "ToolTip": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\Form1.cs [Design]",
-              "RelativeToolTip": "MarketStockTracking\\Form1.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-10T13:37:15.652Z",
-              "EditorCaption": " [Design]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Products.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\Products.cs",
-              "RelativeDocumentMoniker": "MarketStockTracking\\Products.cs",
-              "ToolTip": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\Products.cs [Design]",
-              "RelativeToolTip": "MarketStockTracking\\Products.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-09T13:54:09.941Z",
-              "EditorCaption": " [Design]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Products.cs",
-              "DocumentMoniker": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\Products.cs",
-              "RelativeDocumentMoniker": "MarketStockTracking\\Products.cs",
-              "ToolTip": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\Products.cs",
-              "RelativeToolTip": "MarketStockTracking\\Products.cs",
-              "ViewState": "AgIAAB8AAAAAAAAAAAAlwDEAAAAsAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-14T01:01:24.206Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "Stores.cs",
-              "DocumentMoniker": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\Stores.cs",
-              "RelativeDocumentMoniker": "MarketStockTracking\\Stores.cs",
-              "ToolTip": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\Stores.cs",
-              "RelativeToolTip": "MarketStockTracking\\Stores.cs",
-              "ViewState": "AgIAAC4AAAAAAAAAAAAIwFoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-13T23:50:59.298Z",
               "EditorCaption": ""
             }
           ]
         },
         {
-          "DockedWidth": 17,
+          "DockedWidth": 160,
           "SelectedChildIndex": 0,
           "Children": [
             {
