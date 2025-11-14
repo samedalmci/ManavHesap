@@ -16,29 +16,49 @@ namespace MarketStockTracking
     public partial class Products : Form
     {
 
+
+
         string baglanti = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;";
         SqlConnection conn;
 
         public Products()
         {
             InitializeComponent();
+
+            // BURAYA EKLE
+            txtUrunCesidi.DropDownStyle = ComboBoxStyle.DropDownList;
+            txtUrunCesidi.Items.Clear();
+            txtUrunCesidi.Items.Add("Seçiniz...");
+            txtUrunCesidi.Items.Add("Sebze");
+            txtUrunCesidi.Items.Add("Meyve");
+            txtUrunCesidi.SelectedIndex = 0;
+
             conn = new SqlConnection(baglanti);
             ListeleUrunler();
         }
 
         private void btnEkle_Click(object sender, EventArgs e)
         {
+            // SEÇİNİZ KONTROLÜ
+            if (txtUrunCesidi.SelectedIndex == 0)
+            {
+                MessageBox.Show("Lütfen ürün çeşidi seçin.");
+                return;
+            }
+
             conn.Open();
             SqlCommand cmd = new SqlCommand(
-                "INSERT INTO Urunler (UrunAdi, UrunCesidi) VALUES (@ad, @cesit)", conn);
+                    "INSERT INTO Urunler (UrunAdi, UrunCesidi, EklenmeTarihi)VALUES(@ad, @cesit, @tarih)", conn);
             cmd.Parameters.AddWithValue("@ad", txtUrunAdi.Text);
             cmd.Parameters.AddWithValue("@cesit", txtUrunCesidi.Text);
+            cmd.Parameters.AddWithValue("@tarih", DateTime.Now);
             cmd.ExecuteNonQuery();
             conn.Close();
-            MessageBox.Show("Ürün eklendi!");
 
+            MessageBox.Show("Ürün eklendi!");
             ListeleUrunler();
         }
+
 
 
         private void button1_Click(object sender, EventArgs e)

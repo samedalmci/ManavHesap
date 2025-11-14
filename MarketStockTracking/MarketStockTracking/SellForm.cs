@@ -18,6 +18,19 @@ namespace MarketStockTracking
             InitializeComponent();
             conn = new SqlConnection(baglanti);
             SatisUrunler(); // Form açılırken verileri yükle
+
+
+            // Ürün Adı ComboBox
+            txtUrunAdi.DropDownStyle = ComboBoxStyle.DropDownList;
+            txtUrunAdi.Items.Clear();
+            txtUrunAdi.Items.Add("Seçiniz...");
+            txtUrunAdi.SelectedIndex = 0;
+
+            // Mağaza ComboBox
+            txtMagza.DropDownStyle = ComboBoxStyle.DropDownList;
+            txtMagza.Items.Clear();
+            txtMagza.Items.Add("Seçiniz...");
+            txtMagza.SelectedIndex = 0;
         }
 
         private void SellForm_Load(object sender, EventArgs e)
@@ -42,11 +55,17 @@ namespace MarketStockTracking
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 txtUrunAdi.Items.Clear();
+
+                // Varsayılan metni ekle
+                txtUrunAdi.Items.Add("Seçiniz...");
+
                 while (dr.Read())
                 {
                     txtUrunAdi.Items.Add(dr["UrunAdi"].ToString());
                 }
                 dr.Close();
+
+                txtUrunAdi.SelectedIndex = 0; // Seçiniz varsayılan
             }
             finally
             {
@@ -63,11 +82,17 @@ namespace MarketStockTracking
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 txtMagza.Items.Clear();
+
+                // Varsayılan metni ekle
+                txtMagza.Items.Add("Seçiniz...");
+
                 while (dr.Read())
                 {
                     txtMagza.Items.Add(dr["MagazaAdi"].ToString());
                 }
                 dr.Close();
+
+                txtMagza.SelectedIndex = 0; // Seçiniz varsayılan
             }
             finally
             {
@@ -94,14 +119,47 @@ namespace MarketStockTracking
 
         private void button1_Click(object sender, EventArgs e)
         {
+
             try
             {
-                if (string.IsNullOrWhiteSpace(txtUrunAdi.Text) || string.IsNullOrWhiteSpace(txtAdet.Text) || txtAdet.Text == "0")
+                // Zorunlu alan kontrolleri
+                if (txtUrunAdi.SelectedIndex == 0)
                 {
-                    MessageBox.Show("Lütfen Ürün Adı ve geçerli bir Adet girin.", "Eksik Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Lütfen ürün seçin.", "Eksik Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
+                if (txtMagza.SelectedIndex == 0)
+                {
+                    MessageBox.Show("Lütfen mağaza seçin.", "Eksik Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(txtAdet.Text) || txtAdet.Text == "0")
+                {
+                    MessageBox.Show("Lütfen geçerli bir adet girin.", "Eksik Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(txtNet.Text) || txtNet.Text == "0,00 TL")
+                {
+                    MessageBox.Show("Lütfen ürünün net satış fiyatını girin.", "Eksik Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(txtBrut.Text) || txtBrut.Text == "0,00 TL")
+                {
+                    MessageBox.Show("Lütfen ürünün alış fiyatını girin.", "Eksik Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(txtPesin.Text))
+                {
+                    MessageBox.Show("Lütfen peşinat tutarını girin.", "Eksik Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Değerleri parse et
                 decimal adet = int.TryParse(txtAdet.Text, out int a) ? a : 0;
                 decimal net = decimal.TryParse(txtNet.Text.Replace(" TL", ""), NumberStyles.Currency, new CultureInfo("tr-TR"), out decimal n) ? n : 0;
                 decimal brut = decimal.TryParse(txtBrut.Text.Replace(" TL", ""), NumberStyles.Currency, new CultureInfo("tr-TR"), out decimal b) ? b : 0;
@@ -126,8 +184,8 @@ namespace MarketStockTracking
 
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(
-                    "INSERT INTO Satislar (UrunAdi, Magaza, Adet, Net, Brut, Kar, Pesin, Borc) " +
-                    "VALUES (@ad, @magza, @adet, @net, @brut, @kar, @pesin, @borc)", conn);
+                    "INSERT INTO Satislar (UrunAdi, Magaza, Adet, Net, Brut, Kar, Pesin, Borc, EklenmeTarihi) " +
+                    "VALUES (@ad, @magza, @adet, @net, @brut, @kar, @pesin, @borc, @tarih)", conn);
 
                 cmd.Parameters.AddWithValue("@ad", txtUrunAdi.Text);
                 cmd.Parameters.AddWithValue("@magza", txtMagza.Text);
@@ -137,6 +195,7 @@ namespace MarketStockTracking
                 cmd.Parameters.AddWithValue("@kar", karValue);
                 cmd.Parameters.AddWithValue("@pesin", pesin);
                 cmd.Parameters.AddWithValue("@borc", borc);
+                cmd.Parameters.AddWithValue("@tarih", DateTime.Now);
 
                 cmd.ExecuteNonQuery();
                 MessageBox.Show("Satış başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
