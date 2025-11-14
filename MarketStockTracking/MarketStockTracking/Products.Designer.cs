@@ -30,9 +30,9 @@
         {
             txtUrunAdi = new TextBox();
             backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            txtUrunCesidi = new ComboBox();
             button1 = new Button();
             dgvUrunler = new DataGridView();
+            txtUrunCesidi = new ComboBox();
             ((System.ComponentModel.ISupportInitialize)dgvUrunler).BeginInit();
             SuspendLayout();
             // 
@@ -44,15 +44,6 @@
             txtUrunAdi.TabIndex = 2;
             txtUrunAdi.Text = "Ürün İsmi\r\n";
             txtUrunAdi.TextChanged += txtUrunAdi_TextChanged;
-            // 
-            // txtUrunCesidi
-            // 
-            txtUrunCesidi.FormattingEnabled = true;
-            txtUrunCesidi.Items.AddRange(new object[] { "Meyve", "Sebze" });
-            txtUrunCesidi.Location = new Point(237, 47);
-            txtUrunCesidi.Name = "txtUrunCesidi";
-            txtUrunCesidi.Size = new Size(121, 23);
-            txtUrunCesidi.TabIndex = 3;
             // 
             // button1
             // 
@@ -74,6 +65,15 @@
             dgvUrunler.Size = new Size(411, 164);
             dgvUrunler.TabIndex = 6;
             // 
+            // txtUrunCesidi
+            // 
+            txtUrunCesidi.FormattingEnabled = true;
+            txtUrunCesidi.Items.AddRange(new object[] { "Meyve", "Sebze" });
+            txtUrunCesidi.Location = new Point(237, 47);
+            txtUrunCesidi.Name = "txtUrunCesidi";
+            txtUrunCesidi.Size = new Size(121, 23);
+            txtUrunCesidi.TabIndex = 3;
+            // 
             // Products
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -93,8 +93,8 @@
         #endregion
         private TextBox txtUrunAdi;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private ComboBox txtUrunCesidi;
         private Button button1;
         private DataGridView dgvUrunler;
+        private ComboBox txtUrunCesidi;
     }
 }

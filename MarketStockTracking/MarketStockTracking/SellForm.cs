@@ -2,8 +2,8 @@
 using System;
 using System.Data;
 using System.Drawing;
-using System.Windows.Forms;
 using System.Globalization;
+using System.Windows.Forms;
 
 namespace MarketStockTracking
 {
@@ -22,107 +22,109 @@ namespace MarketStockTracking
 
         private void SellForm_Load(object sender, EventArgs e)
         {
-            // Borç alanını salt okunur yap
             txtBorc.ReadOnly = true;
 
-            // Adet alanına sadece tam sayı kuralı
             txtAdet.KeyPress += TxtAdet_KeyPress;
-
-            // Para birimi alanlarına sayı ve bir virgül kuralını bağla
             txtNet.KeyPress += TxtCurrency_KeyPress;
             txtBrut.KeyPress += TxtCurrency_KeyPress;
             txtPesin.KeyPress += TxtCurrency_KeyPress;
+
+            UrunleriYukle();
+            MagazalariYukle();
         }
 
-        // --- UX METODU: Sadece Sayı Girişi İzni (Adet Alanı) ---
+        private void UrunleriYukle()
+        {
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("SELECT UrunAdi FROM Urunler", conn);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                txtUrunAdi.Items.Clear();
+                while (dr.Read())
+                {
+                    txtUrunAdi.Items.Add(dr["UrunAdi"].ToString());
+                }
+                dr.Close();
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        private void MagazalariYukle()
+        {
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("SELECT MagazaAdi FROM Magazalar", conn);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                txtMagza.Items.Clear();
+                while (dr.Read())
+                {
+                    txtMagza.Items.Add(dr["MagazaAdi"].ToString());
+                }
+                dr.Close();
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
         private void TxtAdet_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-            {
                 e.Handled = true;
-            }
         }
 
-        // --- UX METODU: Fiyat Alanları için Sayı ve Virgül İzni ---
         private void TxtCurrency_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (char.IsDigit(e.KeyChar) || char.IsControl(e.KeyChar))
-            {
-                e.Handled = false;
                 return;
-            }
 
-            // Türkçe ondalık ayıracı olan virgüle (,) izin ver
-            if (e.KeyChar == Convert.ToChar(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator) && !((TextBox)sender).Text.Contains(","))
-            {
-                e.Handled = false;
+            if (e.KeyChar == ',' && !((TextBox)sender).Text.Contains(","))
                 return;
-            }
 
             e.Handled = true;
         }
 
-        // --- BUTON TIKLAMA (KAYIT) ---
         private void button1_Click(object sender, EventArgs e)
         {
             try
             {
-                // Basit bir ön kontrol
                 if (string.IsNullOrWhiteSpace(txtUrunAdi.Text) || string.IsNullOrWhiteSpace(txtAdet.Text) || txtAdet.Text == "0")
                 {
                     MessageBox.Show("Lütfen Ürün Adı ve geçerli bir Adet girin.", "Eksik Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                // --- Gerekli Değerleri Temizleyip Alma ---
-
-                // Adet, Net ve Brüt değerlerini al
                 decimal adet = int.TryParse(txtAdet.Text, out int a) ? a : 0;
                 decimal net = decimal.TryParse(txtNet.Text.Replace(" TL", ""), NumberStyles.Currency, new CultureInfo("tr-TR"), out decimal n) ? n : 0;
                 decimal brut = decimal.TryParse(txtBrut.Text.Replace(" TL", ""), NumberStyles.Currency, new CultureInfo("tr-TR"), out decimal b) ? b : 0;
-
-                // Kar/Zarar değerini alıp temizleme
                 string karZararText = txtKarZarar.Text.Replace(" TL", "");
-                decimal karValue;
-                bool karParsed = decimal.TryParse(
-                    karZararText,
-                    NumberStyles.Currency,
-                    new CultureInfo("tr-TR"),
-                    out karValue);
-
-                // Peşin ve Borç değerlerini al
+                decimal.TryParse(karZararText, NumberStyles.Currency, new CultureInfo("tr-TR"), out decimal karValue);
                 decimal pesin = decimal.TryParse(txtPesin.Text.Replace(" TL", ""), NumberStyles.Currency, new CultureInfo("tr-TR"), out decimal p) ? p : 0;
                 decimal borc = decimal.TryParse(txtBorc.Text.Replace(" TL", ""), NumberStyles.Currency, new CultureInfo("tr-TR"), out decimal bo) ? bo : 0;
 
-                // Toplam Satış Tutarı (Kontrol için gerekli)
                 decimal toplamSatisTutari = adet * net;
 
-                // --- FAZLA ÖDEME KONTROLÜ (Yeni Eklenen Bölüm) ---
                 if (pesin > toplamSatisTutari)
                 {
-                    string onayMesaji = string.Format(
-                        new CultureInfo("tr-TR"),
-                        "Girilen Peşinat Tutarı ({0:N2} TL), Toplam Satış Tutarı'nı ({1:N2} TL) aşıyor.\nFazla ödeme yapılıyor. Kaydı onaylıyor musunuz?",
-                        pesin,
-                        toplamSatisTutari);
-
                     DialogResult result = MessageBox.Show(
-                        onayMesaji,
-                        "Fazla Ödeme Onayı",
+                        $"Girilen Peşinat ({pesin:N2} TL), Toplam Satış Tutarı ({toplamSatisTutari:N2} TL) aşıyor. Kaydı onaylıyor musunuz?",
+                        "Fazla Ödeme",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Question);
 
                     if (result == DialogResult.No)
-                    {
-                        // Kullanıcı Hayır derse, kaydetme işlemini durdur
                         return;
-                    }
                 }
-                // --- KONTROL SONU ---
-
 
                 conn.Open();
-
                 SqlCommand cmd = new SqlCommand(
                     "INSERT INTO Satislar (UrunAdi, Magaza, Adet, Net, Brut, Kar, Pesin, Borc) " +
                     "VALUES (@ad, @magza, @adet, @net, @brut, @kar, @pesin, @borc)", conn);
@@ -132,7 +134,7 @@ namespace MarketStockTracking
                 cmd.Parameters.AddWithValue("@adet", adet);
                 cmd.Parameters.AddWithValue("@net", net);
                 cmd.Parameters.AddWithValue("@brut", brut);
-                cmd.Parameters.AddWithValue("@kar", karParsed ? karValue : 0);
+                cmd.Parameters.AddWithValue("@kar", karValue);
                 cmd.Parameters.AddWithValue("@pesin", pesin);
                 cmd.Parameters.AddWithValue("@borc", borc);
 
@@ -141,7 +143,7 @@ namespace MarketStockTracking
             }
             catch (SqlException sqlex)
             {
-                MessageBox.Show($"Veritabanı Hatası: Kayıt sırasında bir sorun oluştu.\n{sqlex.Message}", "Kayıt Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Veritabanı Hatası: {sqlex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
@@ -150,73 +152,37 @@ namespace MarketStockTracking
             finally
             {
                 if (conn.State == ConnectionState.Open)
-                {
                     conn.Close();
-                }
-                SatisUrunler(); // Kayıt sonrası tabloyu yenile
+
+                SatisUrunler();
             }
         }
 
-        // --- FONKSIYONLAR ---
-
         private void ProfitCalculation()
         {
-            decimal adet = 0;
-            decimal net = 0;
-            decimal brut = 0;
+            decimal adet = decimal.TryParse(txtAdet.Text, out decimal a) ? a : 0;
+            decimal net = decimal.TryParse(txtNet.Text.Replace(" TL", ""), NumberStyles.Currency, new CultureInfo("tr-TR"), out decimal n) ? n : 0;
+            decimal brut = decimal.TryParse(txtBrut.Text.Replace(" TL", ""), NumberStyles.Currency, new CultureInfo("tr-TR"), out decimal b) ? b : 0;
 
-            decimal.TryParse(txtAdet.Text, out adet);
-
-            string netText = txtNet.Text.Replace(" TL", "");
-            string brutText = txtBrut.Text.Replace(" TL", "");
-
-            decimal.TryParse(netText, NumberStyles.Currency, new CultureInfo("tr-TR"), out net);
-            decimal.TryParse(brutText, NumberStyles.Currency, new CultureInfo("tr-TR"), out brut);
-
-            // Hesaplama: Adet * (Satış Fiyatı - Maliyet Fiyatı)
             decimal sonuc = adet * (net - brut);
 
             txtKarZarar.Text = sonuc.ToString("N2", new CultureInfo("tr-TR")) + " TL";
-
             txtKarZarar.ForeColor = sonuc < 0 ? Color.Red : Color.Green;
         }
 
         private void DebtCalculation()
         {
-            decimal adet = 0;
-            decimal net = 0; // Birim Satış Fiyatı
-            decimal pesin = 0; // Peşin ödenen miktar
+            decimal adet = decimal.TryParse(txtAdet.Text, out decimal a) ? a : 0;
+            decimal net = decimal.TryParse(txtNet.Text.Replace(" TL", ""), NumberStyles.Currency, new CultureInfo("tr-TR"), out decimal n) ? n : 0;
+            decimal pesin = decimal.TryParse(txtPesin.Text.Replace(" TL", ""), NumberStyles.Currency, new CultureInfo("tr-TR"), out decimal p) ? p : 0;
 
-            decimal.TryParse(txtAdet.Text, out adet);
+            decimal kalan = (adet * net) - pesin;
+            if (kalan < 0) kalan = 0;
 
-            // Net Fiyatı (Satış Fiyatı) formatından temizle
-            string netText = txtNet.Text.Replace(" TL", "");
-            decimal.TryParse(netText, NumberStyles.Currency, new CultureInfo("tr-TR"), out net);
-
-            // Peşin Fiyatı formatından temizle
-            string pesinText = txtPesin.Text.Replace(" TL", "");
-            decimal.TryParse(pesinText, NumberStyles.Currency, new CultureInfo("tr-TR"), out pesin);
-
-            // Müşterinin toplam ödemesi gereken tutar (Net Fiyat * Adet)
-            decimal toplamSatisTutari = adet * net;
-
-            // Kalan Borç = Toplam Tutar - Peşinat
-            decimal kalanBorc = toplamSatisTutari - pesin;
-
-            // Borç hiçbir zaman negatif olamaz (Fazla ödeme yapıldıysa borç 0'dır)
-            if (kalanBorc < 0)
-            {
-                kalanBorc = 0;
-            }
-
-            // Sonucu txtBorc alanına formatlı şekilde yaz
-            txtBorc.Text = kalanBorc.ToString("N2", new CultureInfo("tr-TR")) + " TL";
-
-            // Borç varsa kırmızı renkte göster
-            txtBorc.ForeColor = kalanBorc > 0 ? Color.Red : Color.Black;
+            txtBorc.Text = kalan.ToString("N2", new CultureInfo("tr-TR")) + " TL";
+            txtBorc.ForeColor = kalan > 0 ? Color.Red : Color.Black;
         }
 
-        // --- SATIŞ VERİLERİNİ YÜKLEME VE GÖSTERME METODU (Düzeltildi) ---
         private void SatisUrunler()
         {
             try
@@ -225,26 +191,14 @@ namespace MarketStockTracking
                 SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Satislar", conn);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
-
-                // Hata aldığınız yerdeki önemli satır: Verinin tabloya atanması
-                // Eğer DataGridView kontrolünüzün adı 'dgvUrunler' değilse, lütfen bu adı değiştirin.
                 dgvUrunler.DataSource = dt;
-            }
-            catch (Exception ex)
-            {
-                // Veri yüklenemezse kullanıcıyı bilgilendir
-                MessageBox.Show("Satış verileri yüklenirken bir hata oluştu: " + ex.Message, "Veri Yükleme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
                 if (conn.State == ConnectionState.Open)
-                {
                     conn.Close();
-                }
             }
         }
-
-        // --- TEXTCHANGED OLAYLARI ---
 
         private void txtNet_TextChanged(object sender, EventArgs e)
         {
@@ -319,7 +273,7 @@ namespace MarketStockTracking
 
         private void txtBorc_TextChanged(object sender, EventArgs e)
         {
-            // Borç alanı ReadOnly olduğu için manuel giriş yoktur.
+            // ReadOnly olduğu için manuel giriş yok
         }
     }
 }
