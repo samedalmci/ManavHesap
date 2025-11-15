@@ -4,6 +4,7 @@ using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
+using ClosedXML.Excel;
 
 namespace MarketStockTracking
 {
@@ -32,6 +33,8 @@ namespace MarketStockTracking
         private void SellForm_Load(object sender, EventArgs e)
         {
             txtBorc.ReadOnly = true;
+
+
 
             txtAdet.KeyPress += TxtAdet_KeyPress;
             txtNet.KeyPress += TxtCurrency_KeyPress;
@@ -341,6 +344,63 @@ namespace MarketStockTracking
         private void txtBorc_TextChanged(object sender, EventArgs e)
         {
             // txtBorc readonly; designer referansı olduğu için boş bırakıldı.
+        }
+
+
+        // ... (diğer metotlar)
+
+        private void ExportToExcel()
+        {
+            // Kullanıcıya dosyayı nereye kaydedeceğini sor
+            SaveFileDialog sfd = new SaveFileDialog();
+            // Uzantıyı .xlsx olarak bırakabiliriz, çünkü artık gerçek bir XLSX dosyası oluşturuyoruz.
+            sfd.Filter = "Excel Dosyaları (*.xlsx)|*.xlsx|Tüm Dosyalar (*.*)|*.*";
+            sfd.FileName = "Satislar_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xlsx";
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    // 1. DataTable'ı DataGridView'den Oluştur
+                    DataTable dt = new DataTable();
+                    foreach (DataGridViewColumn column in dgvUrunler.Columns)
+                    {
+                        dt.Columns.Add(column.HeaderText);
+                    }
+                    foreach (DataGridViewRow row in dgvUrunler.Rows)
+                    {
+                        if (row.IsNewRow) continue; // Yeni eklenen boş satırı atla
+                        dt.Rows.Add(row.Cells.Cast<DataGridViewCell>().Select(c => c.Value).ToArray());
+                    }
+
+                    // 2. ClosedXML ile Çalışma Kitabı Oluştur
+                    using (var workbook = new XLWorkbook())
+                    {
+                        // DataTable'ı bir çalışma sayfasına ekle
+                        var worksheet = workbook.Worksheets.Add(dt, "Satış Verileri");
+
+                        // Başlık satırını kalın yap
+                        worksheet.Row(1).Style.Font.Bold = true;
+
+                        // Sütunları içeriğe göre otomatik boyutlandır
+                        worksheet.Columns().AdjustToContents();
+
+                        // Dosyayı kaydet
+                        workbook.SaveAs(sfd.FileName);
+                    }
+
+                    MessageBox.Show("Veriler Excel (.xlsx) Dosyası olarak başarıyla kaydedildi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Dosya kaydedilirken bir hata oluştu. ClosedXML hatası: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void btnExportExcel_Click(object sender, EventArgs e)
+        {
+            ExportToExcel();
         }
     }
 }

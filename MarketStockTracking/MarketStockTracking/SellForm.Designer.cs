@@ -46,11 +46,13 @@
             label10 = new Label();
             label11 = new Label();
             dgvUrunler = new DataGridView();
+            btnExportExcel = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvUrunler).BeginInit();
             SuspendLayout();
             // 
             // txtUrunAdi
             // 
+            txtUrunAdi.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             txtUrunAdi.FormattingEnabled = true;
             txtUrunAdi.Location = new Point(43, 61);
             txtUrunAdi.Name = "txtUrunAdi";
@@ -59,6 +61,7 @@
             // 
             // txtMagza
             // 
+            txtMagza.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             txtMagza.FormattingEnabled = true;
             txtMagza.Location = new Point(43, 127);
             txtMagza.Name = "txtMagza";
@@ -67,6 +70,7 @@
             // 
             // label1
             // 
+            label1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             label1.AutoSize = true;
             label1.Location = new Point(43, 31);
             label1.Name = "label1";
@@ -76,6 +80,7 @@
             // 
             // label2
             // 
+            label2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             label2.AutoSize = true;
             label2.Location = new Point(43, 97);
             label2.Name = "label2";
@@ -85,6 +90,7 @@
             // 
             // label3
             // 
+            label3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             label3.AutoSize = true;
             label3.Location = new Point(204, 105);
             label3.Name = "label3";
@@ -94,6 +100,7 @@
             // 
             // label4
             // 
+            label4.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             label4.AutoSize = true;
             label4.Location = new Point(204, 31);
             label4.Name = "label4";
@@ -103,6 +110,7 @@
             // 
             // txtAdet
             // 
+            txtAdet.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             txtAdet.Location = new Point(336, 89);
             txtAdet.Name = "txtAdet";
             txtAdet.Size = new Size(100, 23);
@@ -111,6 +119,7 @@
             // 
             // txtNet
             // 
+            txtNet.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             txtNet.Location = new Point(204, 61);
             txtNet.Name = "txtNet";
             txtNet.Size = new Size(100, 23);
@@ -119,6 +128,7 @@
             // 
             // txtBrut
             // 
+            txtBrut.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             txtBrut.Location = new Point(204, 127);
             txtBrut.Name = "txtBrut";
             txtBrut.Size = new Size(100, 23);
@@ -127,6 +137,7 @@
             // 
             // label5
             // 
+            label5.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             label5.AutoSize = true;
             label5.Location = new Point(336, 61);
             label5.Name = "label5";
@@ -136,6 +147,7 @@
             // 
             // txtKarZarar
             // 
+            txtKarZarar.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             txtKarZarar.AutoSize = true;
             txtKarZarar.Font = new Font("Segoe UI", 20.25F, FontStyle.Regular, GraphicsUnit.Point, 162);
             txtKarZarar.Location = new Point(204, 194);
@@ -146,6 +158,7 @@
             // 
             // button1
             // 
+            button1.Anchor = AnchorStyles.Top;
             button1.Location = new Point(634, 48);
             button1.Name = "button1";
             button1.Size = new Size(112, 102);
@@ -156,6 +169,7 @@
             // 
             // label9
             // 
+            label9.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             label9.AutoSize = true;
             label9.Location = new Point(204, 173);
             label9.Name = "label9";
@@ -165,6 +179,7 @@
             // 
             // txtPesin
             // 
+            txtPesin.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             txtPesin.Location = new Point(482, 61);
             txtPesin.Name = "txtPesin";
             txtPesin.Size = new Size(100, 23);
@@ -173,6 +188,7 @@
             // 
             // txtBorc
             // 
+            txtBorc.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             txtBorc.Location = new Point(482, 127);
             txtBorc.Name = "txtBorc";
             txtBorc.Size = new Size(100, 23);
@@ -181,6 +197,7 @@
             // 
             // label10
             // 
+            label10.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             label10.AutoSize = true;
             label10.Location = new Point(482, 31);
             label10.Name = "label10";
@@ -190,6 +207,7 @@
             // 
             // label11
             // 
+            label11.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             label11.AutoSize = true;
             label11.Location = new Point(482, 105);
             label11.Name = "label11";
@@ -200,18 +218,31 @@
             // dgvUrunler
             // 
             dgvUrunler.AllowUserToAddRows = false;
+            dgvUrunler.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvUrunler.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvUrunler.Location = new Point(43, 258);
+            dgvUrunler.Location = new Point(43, 245);
             dgvUrunler.Name = "dgvUrunler";
             dgvUrunler.ReadOnly = true;
             dgvUrunler.Size = new Size(703, 230);
             dgvUrunler.TabIndex = 21;
             // 
+            // btnExportExcel
+            // 
+            btnExportExcel.Anchor = AnchorStyles.Top;
+            btnExportExcel.Location = new Point(634, 201);
+            btnExportExcel.Name = "btnExportExcel";
+            btnExportExcel.Size = new Size(112, 36);
+            btnExportExcel.TabIndex = 22;
+            btnExportExcel.Text = "Excel Olarak İndir";
+            btnExportExcel.UseVisualStyleBackColor = true;
+            btnExportExcel.Click += btnExportExcel_Click;
+            // 
             // SellForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(777, 518);
+            ClientSize = new Size(788, 542);
+            Controls.Add(btnExportExcel);
             Controls.Add(dgvUrunler);
             Controls.Add(label11);
             Controls.Add(label10);
@@ -257,5 +288,6 @@
         private Label label10;
         private Label label11;
         private DataGridView dgvUrunler;
+        private Button btnExportExcel;
     }
 }
