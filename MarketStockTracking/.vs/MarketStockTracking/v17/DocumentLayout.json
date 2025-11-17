@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\",
+  "WorkspaceRootPath": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|c:\\users\\tobil\\onedrive\\masa\u00FCst\u00FC\\manavhesap\\marketstocktracking\\marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|c:\\users\\samed\\desktop\\manavhesap\\marketstocktracking\\marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|c:\\users\\tobil\\onedrive\\masa\u00FCst\u00FC\\manavhesap\\marketstocktracking\\marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|c:\\users\\samed\\desktop\\manavhesap\\marketstocktracking\\marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
   ],
@@ -24,9 +24,9 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "SellForm.cs",
-              "DocumentMoniker": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\SellForm.cs",
+              "DocumentMoniker": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\SellForm.cs",
               "RelativeDocumentMoniker": "MarketStockTracking\\SellForm.cs",
-              "ToolTip": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\SellForm.cs",
+              "ToolTip": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\SellForm.cs",
               "RelativeToolTip": "MarketStockTracking\\SellForm.cs",
               "ViewState": "AgIAAGsBAAAAAAAAAAAQwH0BAAA0AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -43,9 +43,9 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "SellForm.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\SellForm.cs",
+              "DocumentMoniker": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\SellForm.cs",
               "RelativeDocumentMoniker": "MarketStockTracking\\SellForm.cs",
-              "ToolTip": "C:\\Users\\tobil\\OneDrive\\Masa\u00FCst\u00FC\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\SellForm.cs [Design]",
+              "ToolTip": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\SellForm.cs [Design]",
               "RelativeToolTip": "MarketStockTracking\\SellForm.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-14T03:03:34.829Z",
