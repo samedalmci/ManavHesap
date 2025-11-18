@@ -3,6 +3,7 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 using ClosedXML.Excel;
 
@@ -10,6 +11,7 @@ namespace MarketStockTracking
 {
     public partial class SellForm : Form
     {
+        // SQL bağlantı dizesi
         string baglanti = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;";
         SqlConnection conn;
 
@@ -17,8 +19,10 @@ namespace MarketStockTracking
         {
             InitializeComponent();
             conn = new SqlConnection(baglanti);
+
             SatisUrunler();
 
+            // ComboBox'ların başlangıç ayarları
             txtUrunAdi.DropDownStyle = ComboBoxStyle.DropDownList;
             txtUrunAdi.Items.Clear();
             txtUrunAdi.Items.Add("Seçiniz...");
@@ -34,12 +38,16 @@ namespace MarketStockTracking
         {
             txtBorc.ReadOnly = true;
 
-
-
+            // KeyPress olayları ile sadece rakam ve virgül girişine izin verilir
             txtAdet.KeyPress += TxtAdet_KeyPress;
             txtNet.KeyPress += TxtCurrency_KeyPress;
             txtBrut.KeyPress += TxtCurrency_KeyPress;
             txtPesin.KeyPress += TxtCurrency_KeyPress;
+
+            // Leave olayları ile alandan çıkıldığında otomatik formatlama yapılır
+            txtNet.Leave += TxtCurrency_Leave;
+            txtBrut.Leave += TxtCurrency_Leave;
+            txtPesin.Leave += TxtCurrency_Leave;
 
             UrunleriYukle();
             MagazalariYukle();
@@ -66,7 +74,7 @@ namespace MarketStockTracking
             }
             finally
             {
-                conn.Close();
+                if (conn.State == ConnectionState.Open) conn.Close();
             }
         }
 
@@ -91,7 +99,7 @@ namespace MarketStockTracking
             }
             finally
             {
-                conn.Close();
+                if (conn.State == ConnectionState.Open) conn.Close();
             }
         }
 
@@ -103,61 +111,120 @@ namespace MarketStockTracking
 
         private void TxtCurrency_KeyPress(object sender, KeyPressEventArgs e)
         {
+            TextBox txt = (TextBox)sender;
+
             if (char.IsDigit(e.KeyChar) || char.IsControl(e.KeyChar))
                 return;
 
-            if (e.KeyChar == ',' && !((TextBox)sender).Text.Contains(","))
+            if (e.KeyChar == ',' && !txt.Text.Contains(","))
                 return;
 
             e.Handled = true;
         }
 
+        // **********************************************
+        // * GÜNCEL METOT: ALANDAN ÇIKINCA OTOMATİK FORMAT *
+        // **********************************************
+
+        private void TxtCurrency_Leave(object sender, EventArgs e)
+        {
+            TextBox txt = (TextBox)sender;
+            string input = txt.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                txt.Text = ""; // Boş kalır
+                return;
+            }
+
+            CultureInfo trCulture = new CultureInfo("tr-TR");
+
+            // 1. Girdiyi temizle (binlik ayraçlarını ve TL'yi kaldır)
+            string temizGiris = input.Replace(" TL", "").Replace(".", "");
+
+            // 2. Eğer girişte virgül yoksa, sonuna ",00" ekle (Geçici olarak parse edebilmek için)
+            if (!temizGiris.Contains(","))
+            {
+                temizGiris += ",00";
+            }
+
+            // 3. Geçici formatlanmış metni decimal'e çevir
+            if (decimal.TryParse(temizGiris, NumberStyles.Number, trCulture, out decimal result))
+            {
+                // 4. Decimal değeri tekrar N2 formatında, binlik ayraçlarıyla ve **" TL" ekiyle** ekrana yaz
+                txt.Text = result.ToString("N2", trCulture) + " TL";
+            }
+        }
+
+        // **********************************************
+        // * GÜNCEL YARDIMCI METOT: PARSE İŞLEMİ        *
+        // **********************************************
+
+        /// <summary>
+        /// TextBox'tan gelen metni (ekranda formatlı ve TL'li de olsa) decimal olarak ayrıştırır.
+        /// </summary>
+        private decimal ParseCurrencyInput(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return 0;
+
+            CultureInfo trCulture = new CultureInfo("tr-TR");
+            // TL'yi metinden temizle
+            string temizGiris = input.Trim().Replace(" TL", "");
+
+            // Artık Textbox'ta formatlı (1.000,00 TL) olacağı için direkt parse edilebilir.
+            if (decimal.TryParse(temizGiris, NumberStyles.Number, trCulture, out decimal result))
+            {
+                return result;
+            }
+
+            return 0;
+        }
+
+        // **********************************************
+        // * ANA İŞ METOTLARI                             *
+        // **********************************************
+
         private void button1_Click(object sender, EventArgs e)
         {
             try
             {
-                if (txtUrunAdi.SelectedIndex == 0)
-                {
-                    MessageBox.Show("Lütfen ürün seçin.");
-                    return;
-                }
+                // Eksik alan kontrolleri
+                if (txtUrunAdi.SelectedIndex == 0) { MessageBox.Show("Lütfen ürün seçin."); return; }
+                if (txtMagza.SelectedIndex == 0) { MessageBox.Show("Lütfen mağaza seçin."); return; }
+                if (string.IsNullOrWhiteSpace(txtAdet.Text)) { MessageBox.Show("Lütfen adet girin."); return; }
+                if (string.IsNullOrWhiteSpace(txtNet.Text)) { MessageBox.Show("Net fiyat girin."); return; }
+                if (string.IsNullOrWhiteSpace(txtBrut.Text)) { MessageBox.Show("Alış fiyatı girin."); return; }
+                if (string.IsNullOrWhiteSpace(txtPesin.Text)) { MessageBox.Show("Peşinat girin."); return; }
 
-                if (txtMagza.SelectedIndex == 0)
-                {
-                    MessageBox.Show("Lütfen mağaza seçin.");
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(txtAdet.Text))
-                {
-                    MessageBox.Show("Lütfen adet girin.");
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(txtNet.Text))
-                {
-                    MessageBox.Show("Net fiyat girin.");
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(txtBrut.Text))
-                {
-                    MessageBox.Show("Alış fiyatı girin.");
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(txtPesin.Text))
-                {
-                    MessageBox.Show("Peşinat girin.");
-                    return;
-                }
-
+                // ParseCurrencyInput ile değerler alınır
+                CultureInfo trCulture = new CultureInfo("tr-TR");
                 decimal adet = decimal.Parse(txtAdet.Text);
-                decimal net = decimal.Parse(txtNet.Text.Replace(" TL", ""), new CultureInfo("tr-TR"));
-                decimal brut = decimal.Parse(txtBrut.Text.Replace(" TL", ""), new CultureInfo("tr-TR"));
-                decimal kar = decimal.Parse(txtKarZarar.Text.Replace(" TL", ""), new CultureInfo("tr-TR"));
-                decimal pesin = decimal.Parse(txtPesin.Text.Replace(" TL", ""), new CultureInfo("tr-TR"));
-                decimal borc = decimal.Parse(txtBorc.Text.Replace(" TL", ""), new CultureInfo("tr-TR"));
+                decimal net = ParseCurrencyInput(txtNet.Text);
+                decimal brut = ParseCurrencyInput(txtBrut.Text);
+                decimal pesin = ParseCurrencyInput(txtPesin.Text);
+
+                // Kar ve Borç alanları ekrandan formatlı olarak alınır
+                decimal kar = decimal.TryParse(txtKarZarar.Text.Replace(" TL", ""), NumberStyles.Number, trCulture, out decimal k) ? k : 0;
+                decimal borc = decimal.TryParse(txtBorc.Text.Replace(" TL", ""), NumberStyles.Number, trCulture, out decimal bor) ? bor : 0;
+
+                decimal toplamTutar = adet * net;
+
+                // Peşinat kontrolü
+                if (pesin > toplamTutar)
+                {
+                    DialogResult dr = MessageBox.Show(
+                        "Girdiğiniz peşinat toplam satış tutarından fazla.\nYine de kaydetmek istiyor musunuz?",
+                        "Peşinat Uyarısı",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning
+                    );
+                    if (dr == DialogResult.No)
+                    {
+                        MessageBox.Show("Kayıt iptal edildi.");
+                        return;
+                    }
+                }
 
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(
@@ -193,26 +260,30 @@ namespace MarketStockTracking
 
         private void ProfitCalculation()
         {
+            CultureInfo trCulture = new CultureInfo("tr-TR");
             decimal adet = decimal.TryParse(txtAdet.Text, out decimal a) ? a : 0;
-            decimal net = decimal.TryParse(txtNet.Text.Replace(" TL", ""), out decimal n) ? n : 0;
-            decimal brut = decimal.TryParse(txtBrut.Text.Replace(" TL", ""), out decimal b) ? b : 0;
+
+            decimal net = ParseCurrencyInput(txtNet.Text);
+            decimal brut = ParseCurrencyInput(txtBrut.Text);
 
             decimal sonuc = adet * (net - brut);
 
-            txtKarZarar.Text = sonuc.ToString("N2", new CultureInfo("tr-TR")) + " TL";
+            txtKarZarar.Text = sonuc.ToString("N2", trCulture) + " TL";
             txtKarZarar.ForeColor = sonuc < 0 ? Color.Red : Color.Green;
         }
 
         private void DebtCalculation()
         {
+            CultureInfo trCulture = new CultureInfo("tr-TR");
             decimal adet = decimal.TryParse(txtAdet.Text, out decimal a) ? a : 0;
-            decimal net = decimal.TryParse(txtNet.Text.Replace(" TL", ""), out decimal n) ? n : 0;
-            decimal pesin = decimal.TryParse(txtPesin.Text.Replace(" TL", ""), out decimal p) ? p : 0;
+
+            decimal net = ParseCurrencyInput(txtNet.Text);
+            decimal pesin = ParseCurrencyInput(txtPesin.Text);
 
             decimal kalan = (adet * net) - pesin;
             if (kalan < 0) kalan = 0;
 
-            txtBorc.Text = kalan.ToString("N2", new CultureInfo("tr-TR")) + " TL";
+            txtBorc.Text = kalan.ToString("N2", trCulture) + " TL";
             txtBorc.ForeColor = kalan > 0 ? Color.Red : Color.Black;
         }
 
@@ -228,113 +299,30 @@ namespace MarketStockTracking
             }
             finally
             {
-                conn.Close();
+                if (conn.State == ConnectionState.Open) conn.Close();
             }
         }
 
-        // -----------------------------
-        //       YENİ FORMAT SİSTEMİ
-        // -----------------------------
-
-        private void FormatTL(TextBox txt, EventHandler handler)
-        {
-            if (!txt.Focused) return;
-
-            // 1. TextChanged olayını kaldır ki döngüye girmesin.
-            txt.TextChanged -= handler;
-
-            // 2. Metin kutusundaki formatlı değeri al, " TL" ve tüm binlik ayırıcıları (".") kaldır.
-            string girisMetni = txt.Text
-                .Replace(" TL", "")
-                .Replace(".", "") // Binlik ayırıcıları kaldır (tr-TR'de nokta)
-                .Trim();
-
-            // 3. Sadece sayıları ve bir adet virgülü (ondalık ayırıcı) kabul et
-            string sadeceSayiVeVirgul = "";
-            bool virgulKullanildi = false;
-            foreach (char c in girisMetni)
-            {
-                if (char.IsDigit(c))
-                {
-                    sadeceSayiVeVirgul += c;
-                }
-                // Sadece bir tane ondalık ayırıcıya (virgül) izin ver
-                else if (c == ',' && !virgulKullanildi)
-                {
-                    sadeceSayiVeVirgul += c;
-                    virgulKullanildi = true;
-                }
-            }
-
-            // 4. Ayrıştırma ve Formatlama
-            if (string.IsNullOrEmpty(sadeceSayiVeVirgul))
-            {
-                // Giriş boşsa veya sadece geçersiz karakter varsa 0,00 TL göster.
-                txt.Text = 0.ToString("N2", new CultureInfo("tr-TR")) + " TL";
-            }
-            else
-            {
-                // Türk kültürüne göre (virgül ondalık ayırıcı) ayrıştırmayı dene.
-                if (decimal.TryParse(sadeceSayiVeVirgul,
-                                     NumberStyles.Currency,
-                                     new CultureInfo("tr-TR"),
-                                     out decimal sonuc))
-                {
-                    // Başarılı ayrıştırma: Sayıyı N2 formatında ve " TL" ekleyerek ayarla.
-                    // Örnek: "5" -> 5,00 TL
-                    // Örnek: "55" -> 55,00 TL
-                    // Örnek: "5,5" -> 5,50 TL
-                    txt.Text = sonuc.ToString("N2", new CultureInfo("tr-TR")) + " TL";
-                }
-                else
-                {
-                    // Ayrıştırma başarısız olursa (nadiren olmalı), 0,00 TL göster
-                    txt.Text = 0.ToString("N2", new CultureInfo("tr-TR")) + " TL";
-                }
-            }
-
-            // 5. İmleç Konumunu Ayarla
-            // İmleci virgülün soluna (lira kısmı) konumlandır.
-            int pos = txt.Text.LastIndexOf(",");
-            if (pos != -1)
-            {
-                txt.SelectionStart = pos;
-            }
-            else
-            {
-                // Eğer virgül yoksa (örneğin 1.000 TL), imleci " TL" kısmının soluna ayarla
-                txt.SelectionStart = txt.Text.Length - 3;
-            }
-
-
-            // 6. TextChanged olayını tekrar ata.
-            txt.TextChanged += handler;
-
-            // Hesaplamaları tetikle
-            ProfitCalculation();
-            DebtCalculation();
-        }
+        // **********************************************
+        // * TEXTCHANGED OLAYLARI (Sadece Hesaplama Tetikler) *
+        // **********************************************
 
         private void txtNet_TextChanged(object sender, EventArgs e)
         {
-            FormatTL(txtNet, txtNet_TextChanged);
             ProfitCalculation();
             DebtCalculation();
         }
 
         private void txtBrut_TextChanged(object sender, EventArgs e)
         {
-            FormatTL(txtBrut, txtBrut_TextChanged);
             ProfitCalculation();
         }
 
         private void txtPesin_TextChanged(object sender, EventArgs e)
         {
-            FormatTL(txtPesin, txtPesin_TextChanged);
             DebtCalculation();
         }
 
-        // Designer'ın referans verdiği eksik handler'lar:
         private void txtAdet_TextChanged(object sender, EventArgs e)
         {
             ProfitCalculation();
@@ -343,17 +331,15 @@ namespace MarketStockTracking
 
         private void txtBorc_TextChanged(object sender, EventArgs e)
         {
-            // txtBorc readonly; designer referansı olduğu için boş bırakıldı.
         }
 
-
-        // ... (diğer metotlar)
+        // **********************************************
+        // * EXCEL İŞLEMLERİ                              *
+        // **********************************************
 
         private void ExportToExcel()
         {
-            // Kullanıcıya dosyayı nereye kaydedeceğini sor
             SaveFileDialog sfd = new SaveFileDialog();
-            // Uzantıyı .xlsx olarak bırakabiliriz, çünkü artık gerçek bir XLSX dosyası oluşturuyoruz.
             sfd.Filter = "Excel Dosyaları (*.xlsx)|*.xlsx|Tüm Dosyalar (*.*)|*.*";
             sfd.FileName = "Satislar_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xlsx";
 
@@ -369,23 +355,16 @@ namespace MarketStockTracking
                     }
                     foreach (DataGridViewRow row in dgvUrunler.Rows)
                     {
-                        if (row.IsNewRow) continue; // Yeni eklenen boş satırı atla
+                        if (row.IsNewRow) continue;
                         dt.Rows.Add(row.Cells.Cast<DataGridViewCell>().Select(c => c.Value).ToArray());
                     }
 
                     // 2. ClosedXML ile Çalışma Kitabı Oluştur
                     using (var workbook = new XLWorkbook())
                     {
-                        // DataTable'ı bir çalışma sayfasına ekle
                         var worksheet = workbook.Worksheets.Add(dt, "Satış Verileri");
-
-                        // Başlık satırını kalın yap
                         worksheet.Row(1).Style.Font.Bold = true;
-
-                        // Sütunları içeriğe göre otomatik boyutlandır
                         worksheet.Columns().AdjustToContents();
-
-                        // Dosyayı kaydet
                         workbook.SaveAs(sfd.FileName);
                     }
 
