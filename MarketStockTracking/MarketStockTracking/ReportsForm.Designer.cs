@@ -81,6 +81,7 @@
             // 
             // dgvReport
             // 
+            dgvReport.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvReport.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvReport.Location = new Point(42, 154);
             dgvReport.Name = "dgvReport";

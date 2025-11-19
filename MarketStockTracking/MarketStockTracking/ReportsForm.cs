@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
+using System.Globalization;
+// Diğer using'ler (System.Drawing, vb.) gerekirse eklenir.
 
 namespace MarketStockTracking
 {
@@ -17,13 +17,32 @@ namespace MarketStockTracking
         {
             InitializeComponent();   // Designer kontrolleri yükleniyor
 
+            // Başlangıç ve bitiş tarihlerini ayarla
+            // Varsayılan olarak başlangıç: 01.01.2024, bitiş: Bugün
+            dtpStart.Value = new DateTime(2024, 1, 1);
+            dtpEnd.Value = DateTime.Today;
+
             // Event bağlama
             btnAdet.Click += (s, e) => BuildReport("Adet");
             btnBorc.Click += (s, e) => BuildReport("Borc");
             btnMaliyet.Click += (s, e) => BuildReport("Maliyet");
 
+            // Tarih değiştiğinde de raporu güncelle
+            dtpStart.ValueChanged += (s, e) => BuildReport(GetCurrentMode());
+            dtpEnd.ValueChanged += (s, e) => BuildReport(GetCurrentMode());
+
             // İlk açılışta Adet raporu göster
             BuildReport("Adet");
+        }
+
+        // Hangi rapor modunun aktif olduğunu takip etmek için (isteğe bağlı, kolaylık için)
+        private string currentMode = "Adet";
+
+        private string GetCurrentMode()
+        {
+            // Bu kısım, hangi düğmenin en son tıklandığını veya hangi raporun gösterildiğini
+            // anlamanın bir yolu olmalıdır. Basitçe bir değişken tutabiliriz.
+            return currentMode;
         }
 
 
@@ -31,23 +50,52 @@ namespace MarketStockTracking
         {
             try
             {
+                currentMode = mode; // Aktif modu kaydet
+
+                // 1. Tarihleri al ve SQL'de güvenli kullanım için ayarla
+                // Bitiş tarihi olarak, seçilen günün son anını (23:59:59.997) kullanmak önemlidir 
+                // ki o gün yapılan satışlar da dahil edilsin.
+                DateTime startDate = dtpStart.Value.Date;
+                DateTime endDate = dtpEnd.Value.Date.AddDays(1).AddMilliseconds(-3); // Seçilen günün son anı
+
+                // WHERE koşulunu tanımla. Varsayalım Satislar tablosunda 'Tarih' adında bir sütun var.
+                string whereClause = " WHERE EklenmeTarihi >= @StartDate AND EklenmeTarihi < @EndDate ";
+
+
+                // 2. SQL Sorgularını güncelle
                 string sql = mode switch
                 {
-                    "Adet" => @"SELECT Magaza, UrunAdi, SUM(Adet) AS Value FROM Satislar GROUP BY Magaza, UrunAdi ORDER BY Magaza, UrunAdi",
-                    "Borc" => @"SELECT Magaza, UrunAdi, SUM(Borc) AS Value FROM Satislar GROUP BY Magaza, UrunAdi ORDER BY Magaza, UrunAdi",
-                    "Maliyet" => @"SELECT Magaza, UrunAdi, SUM((Net - Brut) * Adet) AS Value FROM Satislar GROUP BY Magaza, UrunAdi ORDER BY Magaza, UrunAdi",
+                    "Adet" => $@"SELECT Magaza, UrunAdi, SUM(Adet) AS Value 
+                                FROM Satislar {whereClause} 
+                                GROUP BY Magaza, UrunAdi 
+                                ORDER BY Magaza, UrunAdi",
+                    "Borc" => $@"SELECT Magaza, UrunAdi, SUM(Borc) AS Value 
+                                FROM Satislar {whereClause} 
+                                GROUP BY Magaza, UrunAdi 
+                                ORDER BY Magaza, UrunAdi",
+                    "Maliyet" => $@"SELECT Magaza, UrunAdi, SUM((Net - Brut) * Adet) AS Value 
+                                FROM Satislar {whereClause} 
+                                GROUP BY Magaza, UrunAdi 
+                                ORDER BY Magaza, UrunAdi",
                     _ => throw new ArgumentException("Bilinmeyen mod")
                 };
 
                 var table = new DataTable();
                 using (var conn = new SqlConnection(connectionString))
                 using (var cmd = new SqlCommand(sql, conn))
-                using (var da = new SqlDataAdapter(cmd))
                 {
-                    conn.Open();
-                    da.Fill(table);
+                    // 3. SQL Parametrelerini Ekle
+                    cmd.Parameters.AddWithValue("@StartDate", startDate);
+                    cmd.Parameters.AddWithValue("@EndDate", endDate);
+
+                    using (var da = new SqlDataAdapter(cmd))
+                    {
+                        conn.Open();
+                        da.Fill(table);
+                    }
                 }
 
+                // --- Kalan Rapor Oluşturma ve Pivotlama Mantığı Aynı Kalacak ---
                 var products = table.AsEnumerable()
                                     .Select(r => r.Field<string>("UrunAdi"))
                                     .Distinct().OrderBy(x => x).ToList();
