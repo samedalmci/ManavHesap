@@ -225,3 +225,4 @@ C:\Users\samed\Desktop\ManavHesap\MarketStockTracking\MarketStockTracking\obj\De
 C:\Users\samed\Desktop\ManavHesap\MarketStockTracking\MarketStockTracking\obj\Debug\net9.0-windows\MarketStockTracking.genruntimeconfig.cache
 C:\Users\samed\Desktop\ManavHesap\MarketStockTracking\MarketStockTracking\obj\Debug\net9.0-windows\ref\MarketStockTracking.dll
 C:\Users\samed\Desktop\ManavHesap\MarketStockTracking\MarketStockTracking\obj\Debug\net9.0-windows\MarketStockTracking.DebtCancellation.resources
+C:\Users\samed\Desktop\ManavHesap\MarketStockTracking\MarketStockTracking\obj\Debug\net9.0-windows\MarketStockTracking.ReportsForm.resources
