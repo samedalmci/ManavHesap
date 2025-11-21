@@ -24,11 +24,10 @@ namespace MarketStockTracking
         public DebtCancellation()
         {
             InitializeComponent();
-            conn = new SqlConnection(baglanti);
 
-            MagazalariYukle();
+            // HATA ÇÖZÜMÜ: Veritabanı işlemleri (conn oluşturma ve MagazalariYukle) buradan kaldırıldı.
 
-            // *** Olay Atamaları ***
+            // *** Olay Atamaları KALIYOR ***
             txtMagza.SelectedIndexChanged += txtMagza_SelectedIndexChanged;
             dgvBorclar.CellClick += dgvBorclar_CellClick;
 
@@ -42,6 +41,10 @@ namespace MarketStockTracking
 
         private void DebtCancellation_Load(object sender, EventArgs e)
         {
+            // HATA ÇÖZÜMÜ: Veritabanı işlemleri buraya taşındı.
+            conn = new SqlConnection(baglanti);
+            MagazalariYukle();
+
             // DataGridView başlangıçta görünür olduğu için yüklenir yüklenmez borçları listele.
             LoadDebts();
         }

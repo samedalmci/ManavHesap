@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Products));
             txtUrunAdi = new TextBox();
             backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             button1 = new Button();
@@ -104,10 +105,11 @@
             Controls.Add(button1);
             Controls.Add(txtUrunCesidi);
             Controls.Add(txtUrunAdi);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "Products";
-            Text = "Product";
+            Text = "X Manav Ürünler";
             ((System.ComponentModel.ISupportInitialize)dgvUrunler).EndInit();
             ResumeLayout(false);
             PerformLayout();

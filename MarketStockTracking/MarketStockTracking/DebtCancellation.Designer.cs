@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DebtCancellation));
             txtMagza = new ComboBox();
             dgvBorclar = new DataGridView();
             button1 = new Button();
@@ -131,8 +132,11 @@
             Controls.Add(button1);
             Controls.Add(dgvBorclar);
             Controls.Add(txtMagza);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "DebtCancellation";
-            Text = "DebtCancellation";
+            Text = "X Manav Borç Ödeme";
             ((System.ComponentModel.ISupportInitialize)dgvBorclar).EndInit();
             ResumeLayout(false);
             PerformLayout();

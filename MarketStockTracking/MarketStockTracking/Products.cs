@@ -15,9 +15,6 @@ namespace MarketStockTracking
 
     public partial class Products : Form
     {
-
-
-
         string baglanti = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;";
         SqlConnection conn;
 
@@ -25,7 +22,7 @@ namespace MarketStockTracking
         {
             InitializeComponent();
 
-            // BURAYA EKLE
+            // ComboBox doldurma kodları Constructor'da kalabilir, bunlar veritabanı işlemi yapmaz.
             txtUrunCesidi.DropDownStyle = ComboBoxStyle.DropDownList;
             txtUrunCesidi.Items.Clear();
             txtUrunCesidi.Items.Add("Seçiniz...");
@@ -33,6 +30,12 @@ namespace MarketStockTracking
             txtUrunCesidi.Items.Add("Meyve");
             txtUrunCesidi.SelectedIndex = 0;
 
+            // HATA ÇÖZÜMÜ: Veritabanı işlemleri (conn oluşturma ve ListeleUrunler) buradan kaldırıldı!
+        }
+
+        private void Products_Load(object sender, EventArgs e)
+        {
+            // HATA ÇÖZÜMÜ: Veritabanı işlemleri buraya taşındı.
             conn = new SqlConnection(baglanti);
             ListeleUrunler();
         }
@@ -46,14 +49,24 @@ namespace MarketStockTracking
                 return;
             }
 
-            conn.Open();
-            SqlCommand cmd = new SqlCommand(
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(
                     "INSERT INTO Urunler (UrunAdi, UrunCesidi, EklenmeTarihi)VALUES(@ad, @cesit, @tarih)", conn);
-            cmd.Parameters.AddWithValue("@ad", txtUrunAdi.Text);
-            cmd.Parameters.AddWithValue("@cesit", txtUrunCesidi.Text);
-            cmd.Parameters.AddWithValue("@tarih", DateTime.Now);
-            cmd.ExecuteNonQuery();
-            conn.Close();
+                cmd.Parameters.AddWithValue("@ad", txtUrunAdi.Text);
+                cmd.Parameters.AddWithValue("@cesit", txtUrunCesidi.Text);
+                cmd.Parameters.AddWithValue("@tarih", DateTime.Now);
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ürün eklenirken hata oluştu: " + ex.Message);
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open) conn.Close();
+            }
 
             MessageBox.Show("Ürün eklendi!");
             ListeleUrunler();
@@ -70,7 +83,12 @@ namespace MarketStockTracking
         {
             try
             {
-                conn.Open();
+                // Bağlantı nesnesi Form_Load'da oluşturulmuştu. Şimdi sadece açıp kapatıyoruz.
+                if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
+                }
+
                 SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Urunler", conn);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -78,11 +96,11 @@ namespace MarketStockTracking
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Ürünler listelenirken hata oluştu: " + ex.Message);
             }
             finally
             {
-                conn.Close();
+                if (conn.State == ConnectionState.Open) conn.Close();
             }
         }
 

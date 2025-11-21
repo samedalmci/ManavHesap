@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SellForm));
             txtUrunAdi = new ComboBox();
             txtMagza = new ComboBox();
             label1 = new Label();
@@ -261,8 +262,9 @@
             Controls.Add(label1);
             Controls.Add(txtMagza);
             Controls.Add(txtUrunAdi);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "SellForm";
-            Text = "SellForm";
+            Text = "X Manav Satış";
             Load += SellForm_Load;
             ((System.ComponentModel.ISupportInitialize)dgvUrunler).EndInit();
             ResumeLayout(false);

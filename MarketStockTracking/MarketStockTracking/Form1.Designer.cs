@@ -35,11 +35,13 @@
             button1 = new Button();
             button3 = new Button();
             label1 = new Label();
+            pictureBox1 = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // buttonSatis
             // 
-            buttonSatis.Location = new Point(187, 329);
+            buttonSatis.Location = new Point(206, 329);
             buttonSatis.Name = "buttonSatis";
             buttonSatis.Size = new Size(75, 23);
             buttonSatis.TabIndex = 0;
@@ -49,7 +51,7 @@
             // 
             // buttonUrun
             // 
-            buttonUrun.Location = new Point(187, 358);
+            buttonUrun.Location = new Point(206, 358);
             buttonUrun.Name = "buttonUrun";
             buttonUrun.Size = new Size(75, 23);
             buttonUrun.TabIndex = 1;
@@ -59,7 +61,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(187, 387);
+            button2.Location = new Point(206, 387);
             button2.Name = "button2";
             button2.Size = new Size(75, 23);
             button2.TabIndex = 2;
@@ -69,7 +71,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(187, 416);
+            button1.Location = new Point(206, 416);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 3;
@@ -79,7 +81,7 @@
             // 
             // button3
             // 
-            button3.Location = new Point(187, 445);
+            button3.Location = new Point(206, 445);
             button3.Name = "button3";
             button3.Size = new Size(75, 23);
             button3.TabIndex = 4;
@@ -91,11 +93,21 @@
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 48F, FontStyle.Regular, GraphicsUnit.Point, 162);
-            label1.Location = new Point(90, 28);
+            label1.Location = new Point(91, 197);
             label1.Name = "label1";
             label1.Size = new Size(316, 86);
             label1.TabIndex = 5;
             label1.Text = "X MANAV";
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
+            pictureBox1.Location = new Point(179, 38);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(136, 125);
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox1.TabIndex = 6;
+            pictureBox1.TabStop = false;
             // 
             // Form1
             // 
@@ -103,6 +115,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             AutoScroll = true;
             ClientSize = new Size(492, 514);
+            Controls.Add(pictureBox1);
             Controls.Add(label1);
             Controls.Add(button3);
             Controls.Add(button1);
@@ -116,6 +129,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "X Manav Uygulaması";
             Load += Form1_Load;
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -128,5 +142,6 @@
         private Button button1;
         private Button button3;
         private Label label1;
+        private PictureBox pictureBox1;
     }
 }

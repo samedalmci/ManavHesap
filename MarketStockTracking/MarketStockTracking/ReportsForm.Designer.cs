@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ReportsForm));
             dtpStart = new DateTimePicker();
             dtpEnd = new DateTimePicker();
             btnAdet = new Button();
@@ -133,8 +134,9 @@
             Controls.Add(btnAdet);
             Controls.Add(dtpEnd);
             Controls.Add(dtpStart);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "ReportsForm";
-            Text = "Reports";
+            Text = "X Manav Rapor";
             ((System.ComponentModel.ISupportInitialize)dgvReport).EndInit();
             ResumeLayout(false);
             PerformLayout();

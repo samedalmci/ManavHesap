@@ -18,11 +18,10 @@ namespace MarketStockTracking
         public SellForm()
         {
             InitializeComponent();
-            conn = new SqlConnection(baglanti);
 
-            SatisUrunler();
+            // HATA ÇÖZÜMÜ: conn oluşturma ve SatisUrunler() çağrısı buradan silindi!
 
-            // ComboBox'ların başlangıç ayarları
+            // ComboBox'ların başlangıç ayarları (Bunlar kalabilir, veritabanı işlemi yapmaz)
             txtUrunAdi.DropDownStyle = ComboBoxStyle.DropDownList;
             txtUrunAdi.Items.Clear();
             txtUrunAdi.Items.Add("Seçiniz...");
@@ -36,6 +35,9 @@ namespace MarketStockTracking
 
         private void SellForm_Load(object sender, EventArgs e)
         {
+            // HATA ÇÖZÜMÜ: Veritabanı işlemleri buraya taşındı!
+            conn = new SqlConnection(baglanti);
+
             txtBorc.ReadOnly = true;
 
             // KeyPress olayları (Zaten var)
@@ -49,22 +51,22 @@ namespace MarketStockTracking
             txtBrut.Leave += TxtCurrency_Leave;
             txtPesin.Leave += TxtCurrency_Leave;
 
-            // --- YENİ EKLENECEK KISIM BAŞLANGICI ---
-            // Kutucuğa tıklandığında "TL" yazısını silmek için Enter olayını bağlıyoruz
+            // Enter olayları (Zaten var)
             txtNet.Enter += TxtCurrency_Enter;
             txtBrut.Enter += TxtCurrency_Enter;
             txtPesin.Enter += TxtCurrency_Enter;
-            // --- YENİ EKLENECEK KISIM BİTİŞİ ---
 
+            // Veritabanından veri çekme metotları buraya taşındı
             UrunleriYukle();
             MagazalariYukle();
+            SatisUrunler(); // Satış listesi de Form_Load'da listeleniyor
         }
 
         private void UrunleriYukle()
         {
             try
             {
-                conn.Open();
+                if (conn.State == ConnectionState.Closed) conn.Open();
                 SqlCommand cmd = new SqlCommand("SELECT UrunAdi FROM Urunler", conn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
@@ -89,7 +91,7 @@ namespace MarketStockTracking
         {
             try
             {
-                conn.Open();
+                if (conn.State == ConnectionState.Closed) conn.Open();
                 SqlCommand cmd = new SqlCommand("SELECT MagazaAdi FROM Magazalar", conn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
@@ -130,21 +132,22 @@ namespace MarketStockTracking
         }
 
         // **********************************************
-        // * GÜNCEL METOT: ALANDAN ÇIKINCA OTOMATİK FORMAT *
+        // * GÜNCEL METOT: ALANA GİRİNCE FORMATI SİL *
         // **********************************************
         private void TxtCurrency_Enter(object sender, EventArgs e)
         {
             TextBox txt = (TextBox)sender;
-            // Kutucuğa girildiği an "TL" yazısını kaldırır, 
-            // böylece kullanıcı sadece sayı ile muhatap olur.
+
             if (!string.IsNullOrWhiteSpace(txt.Text))
             {
                 txt.Text = txt.Text.Replace(" TL", "").Trim();
-
-                // İsteğe bağlı: Tüm metni seçili hale getirir (kullanım kolaylığı için)
                 txt.SelectAll();
             }
         }
+
+        // **********************************************
+        // * GÜNCEL METOT: ALANDAN ÇIKINCA OTOMATİK FORMAT *
+        // **********************************************
         private void TxtCurrency_Leave(object sender, EventArgs e)
         {
             TextBox txt = (TextBox)sender;
@@ -152,46 +155,35 @@ namespace MarketStockTracking
 
             if (string.IsNullOrWhiteSpace(input))
             {
-                txt.Text = ""; // Boş kalır
+                txt.Text = "";
                 return;
             }
 
             CultureInfo trCulture = new CultureInfo("tr-TR");
-
-            // 1. Girdiyi temizle (binlik ayraçlarını ve TL'yi kaldır)
             string temizGiris = input.Replace(" TL", "").Replace(".", "");
 
-            // 2. Eğer girişte virgül yoksa, sonuna ",00" ekle (Geçici olarak parse edebilmek için)
             if (!temizGiris.Contains(","))
             {
                 temizGiris += ",00";
             }
 
-            // 3. Geçici formatlanmış metni decimal'e çevir
             if (decimal.TryParse(temizGiris, NumberStyles.Number, trCulture, out decimal result))
             {
-                // 4. Decimal değeri tekrar N2 formatında, binlik ayraçlarıyla ve **" TL" ekiyle** ekrana yaz
                 txt.Text = result.ToString("N2", trCulture) + " TL";
             }
         }
 
         // **********************************************
-        // * GÜNCEL YARDIMCI METOT: PARSE İŞLEMİ        *
+        // * GÜNCEL YARDIMCI METOT: PARSE İŞLEMİ *
         // **********************************************
-
-        /// <summary>
-        /// TextBox'tan gelen metni (ekranda formatlı ve TL'li de olsa) decimal olarak ayrıştırır.
-        /// </summary>
         private decimal ParseCurrencyInput(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
                 return 0;
 
             CultureInfo trCulture = new CultureInfo("tr-TR");
-            // TL'yi metinden temizle
             string temizGiris = input.Trim().Replace(" TL", "");
 
-            // Artık Textbox'ta formatlı (1.000,00 TL) olacağı için direkt parse edilebilir.
             if (decimal.TryParse(temizGiris, NumberStyles.Number, trCulture, out decimal result))
             {
                 return result;
@@ -201,7 +193,7 @@ namespace MarketStockTracking
         }
 
         // **********************************************
-        // * ANA İŞ METOTLARI                             *
+        // * ANA İŞ METOTLARI *
         // **********************************************
 
         private void button1_Click(object sender, EventArgs e)
@@ -212,20 +204,28 @@ namespace MarketStockTracking
                 if (txtUrunAdi.SelectedIndex == 0) { MessageBox.Show("Lütfen ürün seçin."); return; }
                 if (txtMagza.SelectedIndex == 0) { MessageBox.Show("Lütfen mağaza seçin."); return; }
                 if (string.IsNullOrWhiteSpace(txtAdet.Text)) { MessageBox.Show("Lütfen adet girin."); return; }
-                if (string.IsNullOrWhiteSpace(txtNet.Text)) { MessageBox.Show("Net fiyat girin."); return; }
-                if (string.IsNullOrWhiteSpace(txtBrut.Text)) { MessageBox.Show("Alış fiyatı girin."); return; }
-                if (string.IsNullOrWhiteSpace(txtPesin.Text)) { MessageBox.Show("Peşinat girin."); return; }
 
-                // ParseCurrencyInput ile değerler alınır
-                CultureInfo trCulture = new CultureInfo("tr-TR");
-                decimal adet = decimal.Parse(txtAdet.Text);
+                // Parse işlemleri
+                decimal adet = decimal.TryParse(txtAdet.Text, out decimal a) ? a : 0;
                 decimal net = ParseCurrencyInput(txtNet.Text);
                 decimal brut = ParseCurrencyInput(txtBrut.Text);
                 decimal pesin = ParseCurrencyInput(txtPesin.Text);
 
+                // Eğer Parse metotlarından sonra hala sıfır ise kullanıcıya uyarı verilir
+                if (net == 0) { MessageBox.Show("Lütfen geçerli Net fiyat girin."); return; }
+                if (brut == 0) { MessageBox.Show("Lütfen geçerli Alış fiyatı girin."); return; }
+                if (pesin == 0 && adet * net > 0)
+                {
+                    // Peşinat 0 olabilir, ancak toplam tutar > 0 ise kullanıcıya uyarı gösterilebilir
+                    // Bu kontrolü yoruma alıyorum, çünkü peşin 0 olabilir (tamamen borçlu satış)
+                }
+
+                CultureInfo trCulture = new CultureInfo("tr-TR");
+
                 // Kar ve Borç alanları ekrandan formatlı olarak alınır
-                decimal kar = decimal.TryParse(txtKarZarar.Text.Replace(" TL", ""), NumberStyles.Number, trCulture, out decimal k) ? k : 0;
-                decimal borc = decimal.TryParse(txtBorc.Text.Replace(" TL", ""), NumberStyles.Number, trCulture, out decimal bor) ? bor : 0;
+                // Not: Hesaplamayı tekrar yapmak, ekrandan okumaktan daha güvenli olabilir.
+                decimal kar = adet * (net - brut);
+                decimal borc = Math.Max(0, (adet * net) - pesin); // Borç negatif olamaz
 
                 decimal toplamTutar = adet * net;
 
@@ -233,7 +233,8 @@ namespace MarketStockTracking
                 if (pesin > toplamTutar)
                 {
                     DialogResult dr = MessageBox.Show(
-                        "Girdiğiniz peşinat toplam satış tutarından fazla.\nYine de kaydetmek istiyor musunuz?",
+                        "Girdiğiniz peşinat toplam satış tutarından fazla.\n" +
+                        "Peşinat tutarı toplam tutara eşitlenecek ve borç 0 olacaktır. Yine de kaydetmek istiyor musunuz?",
                         "Peşinat Uyarısı",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Warning
@@ -243,9 +244,12 @@ namespace MarketStockTracking
                         MessageBox.Show("Kayıt iptal edildi.");
                         return;
                     }
+                    // Peşinatı düzeltip borcu sıfırlıyoruz
+                    pesin = toplamTutar;
+                    borc = 0;
                 }
 
-                conn.Open();
+                if (conn.State == ConnectionState.Closed) conn.Open();
                 SqlCommand cmd = new SqlCommand(
                     "INSERT INTO Satislar (UrunAdi, Magaza, Adet, Net, Brut, Kar, Pesin, Borc, EklenmeTarihi) VALUES (@ad,@m,@adet,@n,@b,@k,@p,@borc,@t)", conn);
 
@@ -273,7 +277,7 @@ namespace MarketStockTracking
             finally
             {
                 if (conn.State == ConnectionState.Open) conn.Close();
-                SatisUrunler();
+                SatisUrunler(); // Kayıt sonrası listeyi yeniden yükle
             }
         }
 
@@ -300,7 +304,7 @@ namespace MarketStockTracking
             decimal pesin = ParseCurrencyInput(txtPesin.Text);
 
             decimal kalan = (adet * net) - pesin;
-            if (kalan < 0) kalan = 0;
+            if (kalan < 0) kalan = 0; // Borç negatif olamaz (fazla ödeme durumunda sıfırlanır)
 
             txtBorc.Text = kalan.ToString("N2", trCulture) + " TL";
             txtBorc.ForeColor = kalan > 0 ? Color.Red : Color.Black;
@@ -310,11 +314,26 @@ namespace MarketStockTracking
         {
             try
             {
-                conn.Open();
+                if (conn.State == ConnectionState.Closed) conn.Open();
                 SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Satislar", conn);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
                 dgvUrunler.DataSource = dt;
+
+                // DataGridView formatlama
+                if (dgvUrunler.Columns.Contains("Net"))
+                    dgvUrunler.Columns["Net"].DefaultCellStyle.Format = "N2";
+                if (dgvUrunler.Columns.Contains("Brut"))
+                    dgvUrunler.Columns["Brut"].DefaultCellStyle.Format = "N2";
+                if (dgvUrunler.Columns.Contains("Kar"))
+                    dgvUrunler.Columns["Kar"].DefaultCellStyle.Format = "N2";
+                if (dgvUrunler.Columns.Contains("Pesin"))
+                    dgvUrunler.Columns["Pesin"].DefaultCellStyle.Format = "N2";
+                if (dgvUrunler.Columns.Contains("Borc"))
+                    dgvUrunler.Columns["Borc"].DefaultCellStyle.Format = "N2";
+                if (dgvUrunler.Columns.Contains("EklenmeTarihi"))
+                    dgvUrunler.Columns["EklenmeTarihi"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
+
             }
             finally
             {
@@ -353,7 +372,7 @@ namespace MarketStockTracking
         }
 
         // **********************************************
-        // * EXCEL İŞLEMLERİ                              *
+        // * EXCEL İŞLEMLERİ *
         // **********************************************
 
         private void ExportToExcel()
@@ -427,7 +446,7 @@ namespace MarketStockTracking
                             // Satırı renklendirmek istersen örnek:
                             if (i % 2 == 0) // çift satırlar hafif gri
                                 ws.Range(i + 2, 1, i + 2, dgvUrunler.Columns.Count)
-                                  .Style.Fill.SetBackgroundColor(XLColor.FromArgb(240, 240, 240));
+                                    .Style.Fill.SetBackgroundColor(XLColor.FromArgb(240, 240, 240));
                         }
 
                         ws.Columns().AdjustToContents();

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Stores));
             dgvMagazalar = new DataGridView();
             btnEkle = new Button();
             txtMagazaAdi = new TextBox();
@@ -81,8 +82,11 @@
             Controls.Add(dgvMagazalar);
             Controls.Add(btnEkle);
             Controls.Add(txtMagazaAdi);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "Stores";
-            Text = "Stores";
+            Text = "X Manav Mağazalar";
             Load += Stores_Load;
             ((System.ComponentModel.ISupportInitialize)dgvMagazalar).EndInit();
             ResumeLayout(false);
