@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             buttonSatis = new Button();
             buttonUrun = new Button();
             button2 = new Button();
@@ -90,16 +91,17 @@
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 48F, FontStyle.Regular, GraphicsUnit.Point, 162);
-            label1.Location = new Point(109, 30);
+            label1.Location = new Point(90, 28);
             label1.Name = "label1";
-            label1.Size = new Size(276, 86);
+            label1.Size = new Size(316, 86);
             label1.TabIndex = 5;
-            label1.Text = "MARKET";
+            label1.Text = "X MANAV";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            AutoScroll = true;
             ClientSize = new Size(492, 514);
             Controls.Add(label1);
             Controls.Add(button3);
@@ -107,8 +109,12 @@
             Controls.Add(button2);
             Controls.Add(buttonUrun);
             Controls.Add(buttonSatis);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "Form1";
-            Text = "Form1";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "X Manav Uygulaması";
             Load += Form1_Load;
             ResumeLayout(false);
             PerformLayout();

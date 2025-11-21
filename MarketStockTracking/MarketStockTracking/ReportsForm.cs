@@ -5,6 +5,8 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using System.Globalization;
+using ClosedXML.Excel;
+using System.IO;
 // Diğer using'ler (System.Drawing, vb.) gerekirse eklenir.
 
 namespace MarketStockTracking
@@ -180,6 +182,115 @@ namespace MarketStockTracking
             {
                 MessageBox.Show("Hata: " + ex.Message);
             }
+        }
+
+        private void ExportToExcel()
+        {
+            if (dgvReport.DataSource == null || dgvReport.Rows.Count == 0)
+            {
+                MessageBox.Show("Dışa aktarılacak veri bulunamadı.");
+                return;
+            }
+
+            try
+            {
+                using (SaveFileDialog sfd = new SaveFileDialog()
+                {
+                    Filter = "Excel Dosyası (*.xlsx)|*.xlsx",
+                    FileName = $"Rapor_{DateTime.Now:yyyy_MM_dd}.xlsx"  
+                })
+                {
+                    if (sfd.ShowDialog() == DialogResult.OK)
+                    {
+                        using (var workbook = new ClosedXML.Excel.XLWorkbook())
+                        {
+                            var ws = workbook.Worksheets.Add("Rapor");
+
+                            int row = 1;
+
+                            // 🔹 Üst bilgi: tarih aralığı
+                            ws.Cell(row, 1).Value = $"Rapor Tarih Aralığı: {dtpStart.Value:dd.MM.yyyy} - {dtpEnd.Value:dd.MM.yyyy}";
+                            ws.Range(row, 1, row, dgvReport.Columns.Count).Merge().Style
+                                .Font.SetBold()
+                                .Font.SetFontSize(12)
+                                .Alignment.SetHorizontal(ClosedXML.Excel.XLAlignmentHorizontalValues.Left);
+
+                            row += 2;
+
+                            // 🔹 Başlık satırı
+                            for (int i = 0; i < dgvReport.Columns.Count; i++)
+                            {
+                                var header = ws.Cell(row, i + 1);
+                                header.Value = dgvReport.Columns[i].HeaderText;
+
+                                header.Style.Fill.SetBackgroundColor(ClosedXML.Excel.XLColor.FromArgb(0, 90, 158));
+                                header.Style.Font.SetFontColor(ClosedXML.Excel.XLColor.White);
+                                header.Style.Font.SetBold();
+                                header.Style.Alignment.SetHorizontal(ClosedXML.Excel.XLAlignmentHorizontalValues.Center);
+                                header.Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                            }
+
+                            int startDataRow = row + 1;
+
+                            // 🔹 Verileri yaz
+                            for (int i = 0; i < dgvReport.Rows.Count; i++)
+                            {
+                                for (int j = 0; j < dgvReport.Columns.Count; j++)
+                                {
+                                    var cell = ws.Cell(startDataRow + i, j + 1);
+                                    var val = dgvReport.Rows[i].Cells[j].Value;
+
+                                    if (val != null && decimal.TryParse(val.ToString(), out decimal num))
+                                        cell.Value = num;
+                                    else
+                                        cell.Value = val?.ToString() ?? "";
+
+                                    cell.Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+
+                                    // Market sütunu sola, sayılar sağa
+                                    if (j == 0)
+                                        cell.Style.Alignment.SetHorizontal(ClosedXML.Excel.XLAlignmentHorizontalValues.Left);
+                                    else
+                                        cell.Style.Alignment.SetHorizontal(ClosedXML.Excel.XLAlignmentHorizontalValues.Right);
+                                }
+
+                                // 🔹 Toplam satırı ve toplam sütunu renklendirme
+                                if (dgvReport.Rows[i].Cells[0].Value?.ToString() == "Toplam")
+                                {
+                                    ws.Range(startDataRow + i, 1, startDataRow + i, dgvReport.Columns.Count)
+                                      .Style.Fill.SetBackgroundColor(ClosedXML.Excel.XLColor.FromArgb(255, 255, 150))
+                                      .Font.SetBold();
+                                }
+
+                                // 🔹 Toplam sütunu (tüm satırlar)
+                                int toplamColIndex = dgvReport.Columns["Toplam"].Index + 1;
+                                ws.Cell(startDataRow + i, toplamColIndex)
+                                  .Style.Fill.SetBackgroundColor(ClosedXML.Excel.XLColor.FromArgb(255, 255, 150))
+                                  .Font.SetBold();
+                            }
+
+                            // 🔹 Sütun genişliklerini otomatik ayarla
+                            ws.Columns().AdjustToContents();
+
+                            workbook.SaveAs(sfd.FileName);
+                        }
+
+                        MessageBox.Show("Excel dosyası başarıyla oluşturuldu!");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hata: " + ex.Message);
+            }
+        }
+
+
+
+
+        private void btnExcelExport_Click(object sender, EventArgs e)
+        {
+            ExportToExcel();
         }
     }
 }

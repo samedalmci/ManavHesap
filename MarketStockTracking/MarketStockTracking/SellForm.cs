@@ -38,16 +38,23 @@ namespace MarketStockTracking
         {
             txtBorc.ReadOnly = true;
 
-            // KeyPress olayları ile sadece rakam ve virgül girişine izin verilir
+            // KeyPress olayları (Zaten var)
             txtAdet.KeyPress += TxtAdet_KeyPress;
             txtNet.KeyPress += TxtCurrency_KeyPress;
             txtBrut.KeyPress += TxtCurrency_KeyPress;
             txtPesin.KeyPress += TxtCurrency_KeyPress;
 
-            // Leave olayları ile alandan çıkıldığında otomatik formatlama yapılır
+            // Leave olayları (Zaten var)
             txtNet.Leave += TxtCurrency_Leave;
             txtBrut.Leave += TxtCurrency_Leave;
             txtPesin.Leave += TxtCurrency_Leave;
+
+            // --- YENİ EKLENECEK KISIM BAŞLANGICI ---
+            // Kutucuğa tıklandığında "TL" yazısını silmek için Enter olayını bağlıyoruz
+            txtNet.Enter += TxtCurrency_Enter;
+            txtBrut.Enter += TxtCurrency_Enter;
+            txtPesin.Enter += TxtCurrency_Enter;
+            // --- YENİ EKLENECEK KISIM BİTİŞİ ---
 
             UrunleriYukle();
             MagazalariYukle();
@@ -125,7 +132,19 @@ namespace MarketStockTracking
         // **********************************************
         // * GÜNCEL METOT: ALANDAN ÇIKINCA OTOMATİK FORMAT *
         // **********************************************
+        private void TxtCurrency_Enter(object sender, EventArgs e)
+        {
+            TextBox txt = (TextBox)sender;
+            // Kutucuğa girildiği an "TL" yazısını kaldırır, 
+            // böylece kullanıcı sadece sayı ile muhatap olur.
+            if (!string.IsNullOrWhiteSpace(txt.Text))
+            {
+                txt.Text = txt.Text.Replace(" TL", "").Trim();
 
+                // İsteğe bağlı: Tüm metni seçili hale getirir (kullanım kolaylığı için)
+                txt.SelectAll();
+            }
+        }
         private void TxtCurrency_Leave(object sender, EventArgs e)
         {
             TextBox txt = (TextBox)sender;
@@ -339,43 +358,94 @@ namespace MarketStockTracking
 
         private void ExportToExcel()
         {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "Excel Dosyaları (*.xlsx)|*.xlsx|Tüm Dosyalar (*.*)|*.*";
-            sfd.FileName = "Satislar_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xlsx";
-
-            if (sfd.ShowDialog() == DialogResult.OK)
+            if (dgvUrunler.Rows.Count == 0)
             {
+                MessageBox.Show("Dışa aktarılacak veri bulunamadı.");
+                return;
+            }
+
+            using (SaveFileDialog sfd = new SaveFileDialog()
+            {
+                Filter = "Excel Dosyaları (*.xlsx)|*.xlsx|Tüm Dosyalar (*.*)|*.*",
+                FileName = $"Satis_Listesi_{DateTime.Now:yyyy_MM_dd}.xlsx"
+            })
+            {
+                if (sfd.ShowDialog() != DialogResult.OK) return;
+
                 try
                 {
-                    // 1. DataTable'ı DataGridView'den Oluştur
+                    // DataTable oluştur
                     DataTable dt = new DataTable();
-                    foreach (DataGridViewColumn column in dgvUrunler.Columns)
-                    {
-                        dt.Columns.Add(column.HeaderText);
-                    }
+                    foreach (DataGridViewColumn col in dgvUrunler.Columns)
+                        dt.Columns.Add(col.HeaderText);
+
                     foreach (DataGridViewRow row in dgvUrunler.Rows)
                     {
                         if (row.IsNewRow) continue;
                         dt.Rows.Add(row.Cells.Cast<DataGridViewCell>().Select(c => c.Value).ToArray());
                     }
 
-                    // 2. ClosedXML ile Çalışma Kitabı Oluştur
                     using (var workbook = new XLWorkbook())
                     {
-                        var worksheet = workbook.Worksheets.Add(dt, "Satış Verileri");
-                        worksheet.Row(1).Style.Font.Bold = true;
-                        worksheet.Columns().AdjustToContents();
+                        var ws = workbook.Worksheets.Add("Satışlar");
+
+                        // Başlık satırı
+                        for (int i = 0; i < dgvUrunler.Columns.Count; i++)
+                        {
+                            var header = ws.Cell(1, i + 1);
+                            header.Value = dgvUrunler.Columns[i].HeaderText;
+                            header.Style.Font.Bold = true;
+                            header.Style.Fill.SetBackgroundColor(XLColor.FromArgb(0, 90, 158)); // koyu mavi
+                            header.Style.Font.SetFontColor(XLColor.White);
+                            header.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                            header.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        }
+
+                        // Verileri yaz
+                        for (int i = 0; i < dgvUrunler.Rows.Count; i++)
+                        {
+                            for (int j = 0; j < dgvUrunler.Columns.Count; j++)
+                            {
+                                var cell = ws.Cell(i + 2, j + 1);
+                                var val = dgvUrunler.Rows[i].Cells[j].Value;
+
+                                if (val != null && decimal.TryParse(val.ToString(), out decimal num))
+                                    cell.Value = num;
+                                else
+                                    cell.Value = val?.ToString() ?? "";
+
+                                // Kenarlık
+                                cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                                // Hizalama: Market ve Ürün sütunları sola, sayılar sağa
+                                if (j == 0 || j == 1) // sütun indexini kontrol et (Market ve Ürün)
+                                    cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
+                                else
+                                    cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                            }
+
+                            // Satırı renklendirmek istersen örnek:
+                            if (i % 2 == 0) // çift satırlar hafif gri
+                                ws.Range(i + 2, 1, i + 2, dgvUrunler.Columns.Count)
+                                  .Style.Fill.SetBackgroundColor(XLColor.FromArgb(240, 240, 240));
+                        }
+
+                        ws.Columns().AdjustToContents();
+
                         workbook.SaveAs(sfd.FileName);
                     }
 
-                    MessageBox.Show("Veriler Excel (.xlsx) Dosyası olarak başarıyla kaydedildi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Satış listesi Excel dosyası olarak başarıyla kaydedildi.",
+                        "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Dosya kaydedilirken bir hata oluştu. ClosedXML hatası: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Excel’e aktarılırken bir hata oluştu: " + ex.Message,
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
+
 
         private void btnExportExcel_Click(object sender, EventArgs e)
         {

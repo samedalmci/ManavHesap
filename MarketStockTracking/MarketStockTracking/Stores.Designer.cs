@@ -31,6 +31,7 @@
             dgvMagazalar = new DataGridView();
             btnEkle = new Button();
             txtMagazaAdi = new TextBox();
+            label1 = new Label();
             ((System.ComponentModel.ISupportInitialize)dgvMagazalar).BeginInit();
             SuspendLayout();
             // 
@@ -47,11 +48,11 @@
             // 
             // btnEkle
             // 
-            btnEkle.Location = new Point(380, 62);
+            btnEkle.Location = new Point(356, 61);
             btnEkle.Name = "btnEkle";
-            btnEkle.Size = new Size(75, 23);
+            btnEkle.Size = new Size(99, 32);
             btnEkle.TabIndex = 9;
-            btnEkle.Text = "button1";
+            btnEkle.Text = "Mağaza Ekle";
             btnEkle.UseVisualStyleBackColor = true;
             btnEkle.Click += btnEkle_Click_1;
             // 
@@ -61,13 +62,22 @@
             txtMagazaAdi.Name = "txtMagazaAdi";
             txtMagazaAdi.Size = new Size(161, 23);
             txtMagazaAdi.TabIndex = 7;
-            txtMagazaAdi.Text = "Ürün İsmi\r\n";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(44, 44);
+            label1.Name = "label1";
+            label1.Size = new Size(73, 15);
+            label1.TabIndex = 11;
+            label1.Text = "Mağaza İsmi";
             // 
             // Stores
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(500, 450);
+            Controls.Add(label1);
             Controls.Add(dgvMagazalar);
             Controls.Add(btnEkle);
             Controls.Add(txtMagazaAdi);
@@ -84,5 +94,6 @@
         private DataGridView dgvMagazalar;
         private Button btnEkle;
         private TextBox txtMagazaAdi;
+        private Label label1;
     }
 }

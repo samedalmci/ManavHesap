@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Data.SqlClient;
 using System.Globalization;
+using ClosedXML.Excel;
+
 
 namespace MarketStockTracking
 {
@@ -307,6 +309,95 @@ namespace MarketStockTracking
             {
                 if (conn.State == ConnectionState.Open) conn.Close();
             }
+        }
+
+        private void ExportToExcel()
+        {
+            if (dgvBorclar.Rows.Count == 0)
+            {
+                MessageBox.Show("Dışa aktarılacak veri bulunamadı.");
+                return;
+            }
+
+            using (SaveFileDialog sfd = new SaveFileDialog()
+            {
+                Filter = "Excel Dosyaları (*.xlsx)|*.xlsx|Tüm Dosyalar (*.*)|*.*",
+                FileName = $"Borc_Hesaplama_{DateTime.Now:yyyy_MM_dd}.xlsx"
+            })
+            {
+                if (sfd.ShowDialog() != DialogResult.OK) return;
+
+                try
+                {
+                    // DataTable oluştur
+                    DataTable dt = new DataTable();
+                    foreach (DataGridViewColumn col in dgvBorclar.Columns)
+                        dt.Columns.Add(col.HeaderText);
+
+                    foreach (DataGridViewRow row in dgvBorclar.Rows)
+                    {
+                        if (row.IsNewRow) continue;
+                        dt.Rows.Add(row.Cells.Cast<DataGridViewCell>().Select(c => c.Value).ToArray());
+                    }
+
+                    using (var workbook = new XLWorkbook())
+                    {
+                        var ws = workbook.Worksheets.Add("Borçlar");
+
+                        // Başlıkları yaz ve kalın yap
+                        for (int i = 0; i < dgvBorclar.Columns.Count; i++)
+                        {
+                            var header = ws.Cell(1, i + 1);
+                            header.Value = dgvBorclar.Columns[i].HeaderText;
+                            header.Style.Font.Bold = true;
+                            header.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                            header.Style.Fill.SetBackgroundColor(XLColor.FromArgb(220, 220, 220)); // Hafif gri
+                            header.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        }
+
+                        // Verileri yaz
+                        for (int i = 0; i < dgvBorclar.Rows.Count; i++)
+                        {
+                            for (int j = 0; j < dgvBorclar.Columns.Count; j++)
+                            {
+                                var cell = ws.Cell(i + 2, j + 1);
+                                var val = dgvBorclar.Rows[i].Cells[j].Value;
+
+                                if (val != null && decimal.TryParse(val.ToString(), out decimal num))
+                                    cell.Value = num;
+                                else
+                                    cell.Value = val?.ToString() ?? "";
+
+                                cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                                // Market sütunu sola, sayılar sağa hizalı
+                                if (j == 1) // Market sütun indexi, istersen dgvBorclar’da kontrol et
+                                    cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
+                                else
+                                    cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                            }
+                        }
+
+                        ws.Columns().AdjustToContents();
+
+                        workbook.SaveAs(sfd.FileName);
+                    }
+
+                    MessageBox.Show("Borç listesi Excel dosyası olarak kaydedildi.",
+                        "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Excel’e aktarılırken bir hata oluştu: " + ex.Message,
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+
+        private void btnExportExcel_Click(object sender, EventArgs e)
+        {
+            ExportToExcel();
         }
     }
 }

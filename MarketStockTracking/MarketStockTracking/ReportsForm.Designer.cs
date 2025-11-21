@@ -34,6 +34,9 @@
             btnBorc = new Button();
             btnMaliyet = new Button();
             dgvReport = new DataGridView();
+            label1 = new Label();
+            label2 = new Label();
+            btnExcelExport = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvReport).BeginInit();
             SuspendLayout();
             // 
@@ -88,11 +91,42 @@
             dgvReport.Size = new Size(627, 347);
             dgvReport.TabIndex = 5;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(107, 30);
+            label1.Name = "label1";
+            label1.Size = new Size(85, 15);
+            label1.TabIndex = 6;
+            label1.Text = "Başlangıç Tarih";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(324, 30);
+            label2.Name = "label2";
+            label2.Size = new Size(57, 15);
+            label2.TabIndex = 7;
+            label2.Text = "Bitiş Tarih";
+            // 
+            // btnExcelExport
+            // 
+            btnExcelExport.Location = new Point(42, 116);
+            btnExcelExport.Name = "btnExcelExport";
+            btnExcelExport.Size = new Size(120, 32);
+            btnExcelExport.TabIndex = 8;
+            btnExcelExport.Text = "Excel Olarak İndir";
+            btnExcelExport.UseVisualStyleBackColor = true;
+            btnExcelExport.Click += btnExcelExport_Click;
+            // 
             // ReportsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(754, 552);
+            Controls.Add(btnExcelExport);
+            Controls.Add(label2);
+            Controls.Add(label1);
             Controls.Add(dgvReport);
             Controls.Add(btnMaliyet);
             Controls.Add(btnBorc);
@@ -103,6 +137,7 @@
             Text = "Reports";
             ((System.ComponentModel.ISupportInitialize)dgvReport).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -113,5 +148,8 @@
         private Button btnBorc;
         private Button btnMaliyet;
         private DataGridView dgvReport;
+        private Label label1;
+        private Label label2;
+        private Button btnExcelExport;
     }
 }
