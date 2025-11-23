@@ -40,6 +40,7 @@
             // 
             dgvMagazalar.AllowUserToAddRows = false;
             dgvMagazalar.AllowUserToDeleteRows = false;
+            dgvMagazalar.BackgroundColor = SystemColors.MenuBar;
             dgvMagazalar.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvMagazalar.Location = new Point(44, 228);
             dgvMagazalar.Name = "dgvMagazalar";
@@ -49,6 +50,7 @@
             // 
             // btnEkle
             // 
+            btnEkle.ForeColor = Color.DarkGreen;
             btnEkle.Location = new Point(356, 61);
             btnEkle.Name = "btnEkle";
             btnEkle.Size = new Size(99, 32);

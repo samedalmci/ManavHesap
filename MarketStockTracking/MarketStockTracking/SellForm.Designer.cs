@@ -160,6 +160,7 @@
             // button1
             // 
             button1.Anchor = AnchorStyles.Top;
+            button1.ForeColor = Color.DarkGreen;
             button1.Location = new Point(634, 48);
             button1.Name = "button1";
             button1.Size = new Size(112, 102);
@@ -200,6 +201,7 @@
             // 
             label10.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             label10.AutoSize = true;
+            label10.ForeColor = Color.Black;
             label10.Location = new Point(482, 31);
             label10.Name = "label10";
             label10.Size = new Size(35, 15);
@@ -220,6 +222,7 @@
             // 
             dgvUrunler.AllowUserToAddRows = false;
             dgvUrunler.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dgvUrunler.BackgroundColor = SystemColors.MenuBar;
             dgvUrunler.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvUrunler.Location = new Point(43, 245);
             dgvUrunler.Name = "dgvUrunler";
@@ -230,6 +233,7 @@
             // btnExportExcel
             // 
             btnExportExcel.Anchor = AnchorStyles.Top;
+            btnExportExcel.ForeColor = Color.DarkGreen;
             btnExportExcel.Location = new Point(634, 201);
             btnExportExcel.Name = "btnExportExcel";
             btnExportExcel.Size = new Size(112, 36);
@@ -242,6 +246,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.WhiteSmoke;
             ClientSize = new Size(788, 542);
             Controls.Add(btnExportExcel);
             Controls.Add(dgvUrunler);

@@ -49,6 +49,7 @@
             // 
             // button1
             // 
+            button1.ForeColor = Color.DarkGreen;
             button1.Location = new Point(383, 38);
             button1.Name = "button1";
             button1.Size = new Size(108, 38);
@@ -60,6 +61,7 @@
             // dgvUrunler
             // 
             dgvUrunler.AllowUserToAddRows = false;
+            dgvUrunler.BackgroundColor = SystemColors.MenuBar;
             dgvUrunler.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvUrunler.Location = new Point(47, 199);
             dgvUrunler.Name = "dgvUrunler";

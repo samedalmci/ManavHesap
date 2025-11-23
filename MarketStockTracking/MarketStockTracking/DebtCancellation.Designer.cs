@@ -51,6 +51,7 @@
             // 
             // dgvBorclar
             // 
+            dgvBorclar.BackgroundColor = SystemColors.MenuBar;
             dgvBorclar.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvBorclar.Location = new Point(57, 138);
             dgvBorclar.Name = "dgvBorclar";
@@ -59,6 +60,7 @@
             // 
             // button1
             // 
+            button1.ForeColor = Color.DarkGreen;
             button1.Location = new Point(501, 177);
             button1.Name = "button1";
             button1.Size = new Size(102, 91);
@@ -110,6 +112,7 @@
             // 
             // btnExportExcel
             // 
+            btnExportExcel.ForeColor = Color.DarkGreen;
             btnExportExcel.Location = new Point(360, 101);
             btnExportExcel.Name = "btnExportExcel";
             btnExportExcel.Size = new Size(117, 31);

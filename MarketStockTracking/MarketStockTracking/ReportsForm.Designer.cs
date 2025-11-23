@@ -58,6 +58,7 @@
             // 
             // btnAdet
             // 
+            btnAdet.ForeColor = Color.DarkGreen;
             btnAdet.Location = new Point(583, 9);
             btnAdet.Name = "btnAdet";
             btnAdet.Size = new Size(75, 23);
@@ -67,6 +68,7 @@
             // 
             // btnBorc
             // 
+            btnBorc.ForeColor = Color.DarkGreen;
             btnBorc.Location = new Point(583, 52);
             btnBorc.Name = "btnBorc";
             btnBorc.Size = new Size(75, 23);
@@ -76,6 +78,7 @@
             // 
             // btnMaliyet
             // 
+            btnMaliyet.ForeColor = Color.DarkGreen;
             btnMaliyet.Location = new Point(583, 98);
             btnMaliyet.Name = "btnMaliyet";
             btnMaliyet.Size = new Size(75, 23);
@@ -86,6 +89,7 @@
             // dgvReport
             // 
             dgvReport.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dgvReport.BackgroundColor = SystemColors.MenuBar;
             dgvReport.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvReport.Location = new Point(42, 154);
             dgvReport.Name = "dgvReport";
@@ -112,6 +116,7 @@
             // 
             // btnExcelExport
             // 
+            btnExcelExport.ForeColor = Color.DarkGreen;
             btnExcelExport.Location = new Point(42, 116);
             btnExcelExport.Name = "btnExcelExport";
             btnExcelExport.Size = new Size(120, 32);
