@@ -265,6 +265,27 @@ namespace MarketStockTracking
 
                 cmd.ExecuteNonQuery();
                 MessageBox.Show("Satış eklendi.");
+
+
+                // Fiş için gerekli verileri topla
+                string urunAdi = txtUrunAdi.Text;
+                decimal birimFiyat = net; // Net fiyatı birim fiyat olarak alıyoruz
+                decimal pesinMiktar = pesin;
+                string magzaAdi = txtMagza.Text;
+
+                // Borç hesaplama
+                //decimal borc = Math.Max(0, (adet * net) - pesin);
+
+                // ReceiptPrinter nesnesini oluştur
+                ReceiptPrinter printer = new ReceiptPrinter(urunAdi, adet, birimFiyat, pesinMiktar, borc, magzaAdi);
+
+                // Eğer Satislar tablosundan ID dönüyorsa, onu atayabilirsiniz
+                // Örnek: printer.SatisNo = insertedSatisId;
+
+                // Fişi yazdır
+                printer.Bas();
+
+
             }
             catch (SqlException sqlex)
             {

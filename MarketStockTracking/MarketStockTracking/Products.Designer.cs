@@ -60,12 +60,10 @@
             // 
             // dgvUrunler
             // 
-            dgvUrunler.AllowUserToAddRows = false;
             dgvUrunler.BackgroundColor = SystemColors.MenuBar;
             dgvUrunler.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvUrunler.Location = new Point(47, 199);
             dgvUrunler.Name = "dgvUrunler";
-            dgvUrunler.ReadOnly = true;
             dgvUrunler.Size = new Size(444, 178);
             dgvUrunler.TabIndex = 6;
             // 
