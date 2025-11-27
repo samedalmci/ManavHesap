@@ -23,7 +23,7 @@ namespace MarketStockTracking.Repositories
             {
                 conn.Open();
 
-                var query = "SELECT UrunID, UrunAdi, UrunCesidi, EklenmeTarihi FROM Urunler ORDER BY EklenmeTarihi DESC";
+                var query = "SELECT ProductID, ProductName, ProductType, AddedDate FROM Products ORDER BY AddedDate DESC";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 using (SqlDataReader rdr = cmd.ExecuteReader())
@@ -32,10 +32,10 @@ namespace MarketStockTracking.Repositories
                     {
                         products.Add(new Product
                         {
-                            UrunID = rdr.GetInt32(0),
-                            UrunAdi = rdr.GetString(1),
-                            UrunCesidi = rdr.GetString(2),
-                            EklenmeTarihi = rdr.GetDateTime(3)
+                            ProductID = rdr.GetInt32(0),
+                            ProductName = rdr.GetString(1),
+                            ProductType = rdr.GetString(2),
+                            AddedDate = rdr.GetDateTime(3)
                         });
                     }
                 }
@@ -50,14 +50,14 @@ namespace MarketStockTracking.Repositories
             {
                 conn.Open();
 
-                var query = @"INSERT INTO Urunler (UrunAdi, UrunCesidi, EklenmeTarihi) 
-                              VALUES (@ad, @cesit, @tarih)";
+                var query = @"INSERT INTO Products (ProductName, ProductType, AddedDate) 
+                              VALUES (@name, @type, @date)";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@ad", product.UrunAdi);
-                    cmd.Parameters.AddWithValue("@cesit", product.UrunCesidi);
-                    cmd.Parameters.AddWithValue("@tarih", product.EklenmeTarihi);
+                    cmd.Parameters.AddWithValue("@name", product.ProductName);
+                    cmd.Parameters.AddWithValue("@type", product.ProductType);
+                    cmd.Parameters.AddWithValue("@date", product.AddedDate);
 
                     return cmd.ExecuteNonQuery();
                 }

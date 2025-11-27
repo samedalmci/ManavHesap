@@ -56,9 +56,9 @@ namespace MarketStockTracking
 
             var product = new Product
             {
-                UrunAdi = txtUrunAdi.Text.Trim(),
-                UrunCesidi = txtUrunCesidi.Text,
-                EklenmeTarihi = DateTime.Now
+                ProductName = txtUrunAdi.Text.Trim(),
+                ProductType = txtUrunCesidi.Text,
+                AddedDate = DateTime.Now
             };
 
             int result = _productRepository.Add(product);

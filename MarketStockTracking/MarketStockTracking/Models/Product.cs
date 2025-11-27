@@ -8,9 +8,9 @@ namespace MarketStockTracking.Models
 {
     public class Product
     {
-        public int UrunID { get; set; }
-        public string UrunAdi { get; set; }
-        public string UrunCesidi { get; set; }
-        public DateTime EklenmeTarihi { get; set; }
+        public int ProductID { get; set; }
+        public string ProductName { get; set; }
+        public string ProductType { get; set; }
+        public DateTime AddedDate { get; set; }
     }
 }
