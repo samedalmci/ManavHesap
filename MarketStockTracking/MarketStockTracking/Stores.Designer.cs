@@ -1,4 +1,5 @@
-﻿namespace MarketStockTracking
+﻿
+namespace MarketStockTracking
 {
     partial class Stores
     {
@@ -31,7 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Stores));
             dgvMagazalar = new DataGridView();
             btnEkle = new Button();
-            txtMagazaAdi = new TextBox();
+            txtStoreName = new TextBox();
             label1 = new Label();
             ((System.ComponentModel.ISupportInitialize)dgvMagazalar).BeginInit();
             SuspendLayout();
@@ -59,12 +60,12 @@
             btnEkle.UseVisualStyleBackColor = true;
             btnEkle.Click += btnEkle_Click_1;
             // 
-            // txtMagazaAdi
+            // txtStoreName
             // 
-            txtMagazaAdi.Location = new Point(44, 62);
-            txtMagazaAdi.Name = "txtMagazaAdi";
-            txtMagazaAdi.Size = new Size(161, 23);
-            txtMagazaAdi.TabIndex = 7;
+            txtStoreName.Location = new Point(44, 62);
+            txtStoreName.Name = "txtStoreName";
+            txtStoreName.Size = new Size(161, 23);
+            txtStoreName.TabIndex = 7;
             // 
             // label1
             // 
@@ -83,7 +84,7 @@
             Controls.Add(label1);
             Controls.Add(dgvMagazalar);
             Controls.Add(btnEkle);
-            Controls.Add(txtMagazaAdi);
+            Controls.Add(txtStoreName);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -99,7 +100,7 @@
 
         private DataGridView dgvMagazalar;
         private Button btnEkle;
-        private TextBox txtMagazaAdi;
+        private TextBox txtStoreName;
         private Label label1;
     }
 }

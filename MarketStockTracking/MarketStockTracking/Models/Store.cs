@@ -10,7 +10,7 @@ namespace MarketStockTracking.Models
     {
         public int StoreID { get; set; }
 
-        public string StoreNem { get; set; }
+        public string StoreName { get; set; }
 
         public DateTime StoreDate { get; set; }
     }

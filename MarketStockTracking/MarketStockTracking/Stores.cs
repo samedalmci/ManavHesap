@@ -1,107 +1,87 @@
-﻿using Microsoft.Data.SqlClient;
-using System;
-using System.Data;
+﻿using System;
 using System.Windows.Forms;
+using MarketStockTracking.Models;
+using MarketStockTracking.Repositories;
 
 namespace MarketStockTracking
 {
     public partial class Stores : Form
     {
-        DataTable tablo; // Mağaza listesini tutacak tablo
-        string baglanti = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;";
-        SqlConnection conn; // Nesne tanımı kalıyor
+        private readonly IStoreRepository _storeRepository;
 
         public Stores()
         {
             InitializeComponent();
 
-            // HATA ÇÖZÜMÜ: conn oluşturma buradan silindi ve Load olayına taşındı.
-
-            TabloHazirla(); // Bu kalabilir, veritabanı işlemi yapmaz
+            // Repository oluştur
+            _storeRepository = new SqlStoreRepository(
+                @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;"
+            );
         }
 
+        // Form Load event
         private void Stores_Load(object sender, EventArgs e)
         {
-            // HATA ÇÖZÜMÜ: Bağlantı nesnesini burada oluşturuyoruz
-            conn = new SqlConnection(baglanti);
-
-            MagazalariYukle(); // Form açıldığında DB’den verileri çek
-
-            // DataGridView başlıklarını ayarla
-            if (dgvMagazalar.Columns.Contains("MagazaAdi"))
-            {
-                dgvMagazalar.Columns["MagazaAdi"].HeaderText = "Mağaza Adı";
-            }
-            if (dgvMagazalar.Columns.Contains("Tarih"))
-            {
-                dgvMagazalar.Columns["Tarih"].HeaderText = "Ekleme Tarihi";
-                dgvMagazalar.Columns["Tarih"].DefaultCellStyle.Format = "dd.MM.yyyy"; // Tarih formatı
-            }
+            LoadStores();
         }
 
-        private void TabloHazirla()
+        private void LoadStores()
         {
-            tablo = new DataTable();
-            tablo.Columns.Add("Tarih");
-            tablo.Columns.Add("MagazaAdi");
-            dgvMagazalar.DataSource = tablo;
-        }
+            dgvMagazalar.DataSource = _storeRepository.GetAll();
 
-        private void MagazalariYukle()
-        {
-            try
+            // Sütun başlıklarını Türkçe yap
+            foreach (DataGridViewColumn col in dgvMagazalar.Columns)
             {
-                if (conn.State == System.Data.ConnectionState.Closed) conn.Open();
-                SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Magazalar", conn);
-                tablo.Clear();
-                da.Fill(tablo);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Veritabanı yükleme hatası: " + ex.Message);
-            }
-            finally
-            {
-                if (conn.State == System.Data.ConnectionState.Open)
-                    conn.Close();
+                switch (col.Name)
+                {
+                    case "StoreName":
+                        col.HeaderText = "Mağaza Adı";
+                        break;
+                    case "StoreDate":
+                        col.HeaderText = "Eklenme Tarihi";
+                        col.DefaultCellStyle.Format = "dd.MM.yyyy HH:mm"; // Tarih formatı
+                        break;
+                    case "Id":
+                        col.HeaderText = "ID"; // Eğer görünmesini istemezseniz col.Visible = false; yapabilirsiniz
+                        break;
+                }
             }
         }
 
+
+        // "Mağaza Ekle" butonu tıklandığında
         private void btnEkle_Click_1(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtMagazaAdi.Text))
+            if (string.IsNullOrWhiteSpace(txtStoreName.Text))
             {
-                MessageBox.Show("Lütfen mağaza adı girin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "Lütfen mağaza adı girin.",
+                    "Uyarı",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
                 return;
             }
 
-            try
+            var store = new Store
             {
-                if (conn.State == System.Data.ConnectionState.Closed) conn.Open();
-                SqlCommand cmd = new SqlCommand(
-                    "INSERT INTO Magazalar (Tarih, MagazaAdi) VALUES (@tarih, @magaza)", conn);
-                // Tarih parametresini DateTime.Now olarak göndermek daha güvenlidir.
-                cmd.Parameters.AddWithValue("@tarih", DateTime.Now);
-                cmd.Parameters.AddWithValue("@magaza", txtMagazaAdi.Text);
-                cmd.ExecuteNonQuery();
+                StoreName = txtStoreName.Text.Trim(),
+                StoreDate = DateTime.Now
+            };
 
-                // DataTable'a da ekle (Doğru DataTable formatında eklenmeli)
-                DataRow row = tablo.NewRow();
-                row["Tarih"] = DateTime.Now; // Tarih sütununa DateTime nesnesi ekle
-                row["MagazaAdi"] = txtMagazaAdi.Text;
-                tablo.Rows.Add(row);
+            int result = _storeRepository.Add(store);
 
-                txtMagazaAdi.Clear();
-                MessageBox.Show("Mağaza başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
+            if (result > 0)
             {
-                MessageBox.Show("Veritabanı hatası: " + ex.Message);
-            }
-            finally
-            {
-                if (conn.State == System.Data.ConnectionState.Open)
-                    conn.Close();
+                MessageBox.Show(
+                    "Mağaza başarıyla eklendi!",
+                    "Başarılı",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+
+                txtStoreName.Clear();
+                LoadStores();
             }
         }
     }

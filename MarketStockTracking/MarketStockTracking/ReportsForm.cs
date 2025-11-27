@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using System.Globalization;
 using ClosedXML.Excel;
-using System.IO;
-// Diğer using'ler (System.Drawing, vb.) gerekirse eklenir.
 
 namespace MarketStockTracking
 {
@@ -17,68 +14,50 @@ namespace MarketStockTracking
 
         public ReportsForm()
         {
-            InitializeComponent();   // Designer kontrolleri yükleniyor
+            InitializeComponent();
 
-            // Başlangıç ve bitiş tarihlerini ayarla
-            // Varsayılan olarak başlangıç: 01.01.2024, bitiş: Bugün
             dtpStart.Value = new DateTime(2024, 1, 1);
             dtpEnd.Value = DateTime.Today;
 
-            // Event bağlama
             btnAdet.Click += (s, e) => BuildReport("Adet");
             btnBorc.Click += (s, e) => BuildReport("Borc");
             btnMaliyet.Click += (s, e) => BuildReport("Maliyet");
 
-            // Tarih değiştiğinde de raporu güncelle
             dtpStart.ValueChanged += (s, e) => BuildReport(GetCurrentMode());
             dtpEnd.ValueChanged += (s, e) => BuildReport(GetCurrentMode());
 
-            // İlk açılışta Adet raporu göster
             BuildReport("Adet");
         }
 
-        // Hangi rapor modunun aktif olduğunu takip etmek için (isteğe bağlı, kolaylık için)
         private string currentMode = "Adet";
 
-        private string GetCurrentMode()
-        {
-            // Bu kısım, hangi düğmenin en son tıklandığını veya hangi raporun gösterildiğini
-            // anlamanın bir yolu olmalıdır. Basitçe bir değişken tutabiliriz.
-            return currentMode;
-        }
-
+        private string GetCurrentMode() => currentMode;
 
         private void BuildReport(string mode)
         {
             try
             {
-                currentMode = mode; // Aktif modu kaydet
+                currentMode = mode;
 
-                // 1. Tarihleri al ve SQL'de güvenli kullanım için ayarla
-                // Bitiş tarihi olarak, seçilen günün son anını (23:59:59.997) kullanmak önemlidir 
-                // ki o gün yapılan satışlar da dahil edilsin.
                 DateTime startDate = dtpStart.Value.Date;
-                DateTime endDate = dtpEnd.Value.Date.AddDays(1).AddMilliseconds(-3); // Seçilen günün son anı
+                DateTime endDate = dtpEnd.Value.Date.AddDays(1).AddMilliseconds(-3);
 
-                // WHERE koşulunu tanımla. Varsayalım Satislar tablosunda 'Tarih' adında bir sütun var.
-                string whereClause = " WHERE EklenmeTarihi >= @StartDate AND EklenmeTarihi < @EndDate ";
+                string whereClause = " WHERE CreatedDate >= @StartDate AND CreatedDate < @EndDate ";
 
-
-                // 2. SQL Sorgularını güncelle
                 string sql = mode switch
                 {
-                    "Adet" => $@"SELECT Magaza, UrunAdi, SUM(Adet) AS Value 
-                                FROM Satislar {whereClause} 
-                                GROUP BY Magaza, UrunAdi 
-                                ORDER BY Magaza, UrunAdi",
-                    "Borc" => $@"SELECT Magaza, UrunAdi, SUM(Borc) AS Value 
-                                FROM Satislar {whereClause} 
-                                GROUP BY Magaza, UrunAdi 
-                                ORDER BY Magaza, UrunAdi",
-                    "Maliyet" => $@"SELECT Magaza, UrunAdi, SUM((Net - Brut) * Adet) AS Value 
-                                FROM Satislar {whereClause} 
-                                GROUP BY Magaza, UrunAdi 
-                                ORDER BY Magaza, UrunAdi",
+                    "Adet" => $@"SELECT StoreName AS Magaza, ProductName AS UrunAdi, SUM(Quantity) AS Value 
+                                 FROM Sales {whereClause} 
+                                 GROUP BY StoreName, ProductName 
+                                 ORDER BY StoreName, ProductName",
+                    "Borc" => $@"SELECT StoreName AS Magaza, ProductName AS UrunAdi, SUM(Debt) AS Value 
+                                 FROM Sales {whereClause} 
+                                 GROUP BY StoreName, ProductName 
+                                 ORDER BY StoreName, ProductName",
+                    "Maliyet" => $@"SELECT StoreName AS Magaza, ProductName AS UrunAdi, SUM((NetPrice - GrossPrice) * Quantity) AS Value 
+                                     FROM Sales {whereClause} 
+                                     GROUP BY StoreName, ProductName 
+                                     ORDER BY StoreName, ProductName",
                     _ => throw new ArgumentException("Bilinmeyen mod")
                 };
 
@@ -86,7 +65,6 @@ namespace MarketStockTracking
                 using (var conn = new SqlConnection(connectionString))
                 using (var cmd = new SqlCommand(sql, conn))
                 {
-                    // 3. SQL Parametrelerini Ekle
                     cmd.Parameters.AddWithValue("@StartDate", startDate);
                     cmd.Parameters.AddWithValue("@EndDate", endDate);
 
@@ -97,7 +75,6 @@ namespace MarketStockTracking
                     }
                 }
 
-                // --- Kalan Rapor Oluşturma ve Pivotlama Mantığı Aynı Kalacak ---
                 var products = table.AsEnumerable()
                                     .Select(r => r.Field<string>("UrunAdi"))
                                     .Distinct().OrderBy(x => x).ToList();
@@ -197,42 +174,39 @@ namespace MarketStockTracking
                 using (SaveFileDialog sfd = new SaveFileDialog()
                 {
                     Filter = "Excel Dosyası (*.xlsx)|*.xlsx",
-                    FileName = $"Rapor_{DateTime.Now:yyyy_MM_dd}.xlsx"  
+                    FileName = $"Rapor_{DateTime.Now:yyyy_MM_dd}.xlsx"
                 })
                 {
                     if (sfd.ShowDialog() == DialogResult.OK)
                     {
-                        using (var workbook = new ClosedXML.Excel.XLWorkbook())
+                        using (var workbook = new XLWorkbook())
                         {
                             var ws = workbook.Worksheets.Add("Rapor");
 
                             int row = 1;
 
-                            // 🔹 Üst bilgi: tarih aralığı
                             ws.Cell(row, 1).Value = $"Rapor Tarih Aralığı: {dtpStart.Value:dd.MM.yyyy} - {dtpEnd.Value:dd.MM.yyyy}";
                             ws.Range(row, 1, row, dgvReport.Columns.Count).Merge().Style
                                 .Font.SetBold()
                                 .Font.SetFontSize(12)
-                                .Alignment.SetHorizontal(ClosedXML.Excel.XLAlignmentHorizontalValues.Left);
+                                .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
 
                             row += 2;
 
-                            // 🔹 Başlık satırı
                             for (int i = 0; i < dgvReport.Columns.Count; i++)
                             {
                                 var header = ws.Cell(row, i + 1);
                                 header.Value = dgvReport.Columns[i].HeaderText;
 
-                                header.Style.Fill.SetBackgroundColor(ClosedXML.Excel.XLColor.FromArgb(0, 90, 158));
-                                header.Style.Font.SetFontColor(ClosedXML.Excel.XLColor.White);
+                                header.Style.Fill.SetBackgroundColor(XLColor.FromArgb(0, 90, 158));
+                                header.Style.Font.SetFontColor(XLColor.White);
                                 header.Style.Font.SetBold();
-                                header.Style.Alignment.SetHorizontal(ClosedXML.Excel.XLAlignmentHorizontalValues.Center);
-                                header.Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                                header.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                                header.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                             }
 
                             int startDataRow = row + 1;
 
-                            // 🔹 Verileri yaz
                             for (int i = 0; i < dgvReport.Rows.Count; i++)
                             {
                                 for (int j = 0; j < dgvReport.Columns.Count; j++)
@@ -245,31 +219,27 @@ namespace MarketStockTracking
                                     else
                                         cell.Value = val?.ToString() ?? "";
 
-                                    cell.Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                                    cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                                    // Market sütunu sola, sayılar sağa
                                     if (j == 0)
-                                        cell.Style.Alignment.SetHorizontal(ClosedXML.Excel.XLAlignmentHorizontalValues.Left);
+                                        cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
                                     else
-                                        cell.Style.Alignment.SetHorizontal(ClosedXML.Excel.XLAlignmentHorizontalValues.Right);
+                                        cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                                 }
 
-                                // 🔹 Toplam satırı ve toplam sütunu renklendirme
                                 if (dgvReport.Rows[i].Cells[0].Value?.ToString() == "Toplam")
                                 {
                                     ws.Range(startDataRow + i, 1, startDataRow + i, dgvReport.Columns.Count)
-                                      .Style.Fill.SetBackgroundColor(ClosedXML.Excel.XLColor.FromArgb(255, 255, 150))
+                                      .Style.Fill.SetBackgroundColor(XLColor.FromArgb(255, 255, 150))
                                       .Font.SetBold();
                                 }
 
-                                // 🔹 Toplam sütunu (tüm satırlar)
                                 int toplamColIndex = dgvReport.Columns["Toplam"].Index + 1;
                                 ws.Cell(startDataRow + i, toplamColIndex)
-                                  .Style.Fill.SetBackgroundColor(ClosedXML.Excel.XLColor.FromArgb(255, 255, 150))
+                                  .Style.Fill.SetBackgroundColor(XLColor.FromArgb(255, 255, 150))
                                   .Font.SetBold();
                             }
 
-                            // 🔹 Sütun genişliklerini otomatik ayarla
                             ws.Columns().AdjustToContents();
 
                             workbook.SaveAs(sfd.FileName);
@@ -284,9 +254,6 @@ namespace MarketStockTracking
                 MessageBox.Show("Hata: " + ex.Message);
             }
         }
-
-
-
 
         private void btnExcelExport_Click(object sender, EventArgs e)
         {

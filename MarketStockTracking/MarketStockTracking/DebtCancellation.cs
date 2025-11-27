@@ -3,40 +3,33 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Data.SqlClient;
-using System.Globalization;
 using ClosedXML.Excel;
-
 
 namespace MarketStockTracking
 {
-
     public partial class DebtCancellation : Form
     {
-        // Bağlantı dizesi (Kendi LocalDB örneğinizle eşleştiğinden emin olun!)
-        string baglanti = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;";
-        SqlConnection conn;
+        private string baglanti = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;";
+        private SqlConnection conn;
 
         public DebtCancellation()
         {
             InitializeComponent();
 
-            // *** Olay Atamaları ***
             txtMagza.SelectedIndexChanged += txtMagza_SelectedIndexChanged;
             dgvBorclar.CellClick += dgvBorclar_CellClick;
 
-            // Ödeme giriş alanına formatlama olaylarını bağla
             txtOdenenMiktar.KeyPress += TxtCurrency_KeyPress;
             txtOdenenMiktar.Leave += TxtCurrency_Leave;
 
-            // Kalan Borç alanını okunamaz yap
             txtKalanBorc.ReadOnly = true;
 
-            // *** DİREKT BURADA ÇAĞIR - EN GARANTİ YÖNTEM ***
             try
             {
                 conn = new SqlConnection(baglanti);
@@ -49,16 +42,12 @@ namespace MarketStockTracking
             }
         }
 
-        // **********************************************
-        // * COMBOBOX VE DATAGRIDVIEW İŞLEMLERİ
-        // **********************************************
-
         private void MagazalariYukle()
         {
             try
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT MagazaAdi FROM Magazalar", conn);
+                SqlCommand cmd = new SqlCommand("SELECT DISTINCT StoreName FROM Stores", conn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 txtMagza.Items.Clear();
@@ -66,7 +55,7 @@ namespace MarketStockTracking
 
                 while (dr.Read())
                 {
-                    txtMagza.Items.Add(dr["MagazaAdi"].ToString());
+                    txtMagza.Items.Add(dr["StoreName"].ToString());
                 }
 
                 dr.Close();
@@ -74,17 +63,13 @@ namespace MarketStockTracking
             }
             finally
             {
-                // Bağlantı her zaman kapatılır.
                 if (conn.State == ConnectionState.Open) conn.Close();
             }
         }
 
         private void txtMagza_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Mağaza değiştiğinde DataGridView'i yeni filtreye göre yükle.
             LoadDebts();
-
-            // Seçim değiştiğinde üstteki alanları temizle.
             txtKalanBorc.Text = "";
             txtOdenenMiktar.Text = "";
         }
@@ -95,27 +80,22 @@ namespace MarketStockTracking
 
             try
             {
-                // Bağlantıyı sadece kapalıysa aç.
                 if (conn.State == ConnectionState.Closed)
-                {
                     conn.Open();
-                }
 
-                string query = "SELECT ID, Magaza, UrunAdi, EklenmeTarihi AS Tarih, Pesin AS [Ödenen Tutar], Borc AS [Kalan Borç Tutarı] FROM Satislar WHERE Borc > 0";
+                string query = "SELECT ID, StoreName AS Magaza, ProductName AS UrunAdi, CreatedDate AS Tarih, CashPaid AS [Ödenen Tutar], Debt AS [Kalan Borç Tutarı] " +
+                               "FROM Sales WHERE Debt > 0";
 
                 if (!string.IsNullOrEmpty(secilenMagaza))
                 {
-                    query += " AND Magaza = @MagazaAdi";
+                    query += " AND StoreName = @MagazaAdi";
                 }
 
-                query += " ORDER BY EklenmeTarihi DESC";
+                query += " ORDER BY CreatedDate DESC";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
-
                 if (!string.IsNullOrEmpty(secilenMagaza))
-                {
                     cmd.Parameters.AddWithValue("@MagazaAdi", secilenMagaza);
-                }
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
@@ -126,7 +106,7 @@ namespace MarketStockTracking
                 if (dgvBorclar.Columns.Count > 0)
                 {
                     var trCulture = new CultureInfo("tr-TR");
-                    // DataGridView'de görünmesini istediğimiz başlık adı. Veriye "ID" sütun adıyla erişeceğiz.
+
                     dgvBorclar.Columns["ID"].HeaderText = "Satış ID";
                     dgvBorclar.Columns["ID"].Width = 60;
                     dgvBorclar.Columns["Tarih"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
@@ -144,28 +124,20 @@ namespace MarketStockTracking
             }
             finally
             {
-                if (conn.State == ConnectionState.Open) conn.Close();
+                if (conn.State == ConnectionState.Open)
+                    conn.Close();
             }
         }
 
-        // **********************************************
-        // * DATAGRIDVIEW SATIR SEÇİMİ (CELL CLICK)
-        // **********************************************
         private void dgvBorclar_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex < 0)
-                return;
+            if (e.RowIndex < 0) return;
 
             try
             {
                 DataGridViewRow selectedRow = dgvBorclar.Rows[e.RowIndex];
-
                 string kalanBorcString = selectedRow.Cells["Kalan Borç Tutarı"].Value.ToString();
-
-                // 1. Kalan Borç Tutarını okunamaz alana yaz
                 txtKalanBorc.Text = kalanBorcString + " TL";
-
-                // 2. Ödeme Giriş Alanını tamamen boşalt (Kullanıcı yeni ödemeyi girecek)
                 txtOdenenMiktar.Text = "";
             }
             catch (Exception ex)
@@ -174,17 +146,11 @@ namespace MarketStockTracking
             }
         }
 
-        // **********************************************
-        // * FORMATLAMA VE PARSE METOTLARI
-        // **********************************************
-
         private void TxtCurrency_KeyPress(object sender, KeyPressEventArgs e)
         {
             TextBox txt = (TextBox)sender;
-            if (char.IsDigit(e.KeyChar) || char.IsControl(e.KeyChar))
-                return;
-            if (e.KeyChar == ',' && !txt.Text.Contains(","))
-                return;
+            if (char.IsDigit(e.KeyChar) || char.IsControl(e.KeyChar)) return;
+            if (e.KeyChar == ',' && !txt.Text.Contains(",")) return;
             e.Handled = true;
         }
 
@@ -202,36 +168,25 @@ namespace MarketStockTracking
             CultureInfo trCulture = new CultureInfo("tr-TR");
             string temizGiris = input.Replace(" TL", "").Replace(".", "");
 
-            if (!temizGiris.Contains(","))
-            {
-                temizGiris += ",00";
-            }
+            if (!temizGiris.Contains(",")) temizGiris += ",00";
 
             if (decimal.TryParse(temizGiris, NumberStyles.Number, trCulture, out decimal result))
-            {
                 txt.Text = result.ToString("N2", trCulture) + " TL";
-            }
         }
 
         private decimal ParseCurrencyInput(string input)
         {
-            if (string.IsNullOrWhiteSpace(input))
-                return 0;
+            if (string.IsNullOrWhiteSpace(input)) return 0;
 
             CultureInfo trCulture = new CultureInfo("tr-TR");
             string temizGiris = input.Trim().Replace(" TL", "");
 
             if (decimal.TryParse(temizGiris, NumberStyles.Number, trCulture, out decimal result))
-            {
                 return result;
-            }
 
             return 0;
         }
 
-        // **********************************************
-        // * GÜNCEL METOT: BUTON TIKLAMA OLAYI (Ödeme Yap)
-        // **********************************************
         private void button1_Click(object sender, EventArgs e)
         {
             if (txtMagza.SelectedIndex == 0)
@@ -247,8 +202,6 @@ namespace MarketStockTracking
             }
 
             int selectedRowIndex = dgvBorclar.SelectedRows[0].Index;
-
-            // HATA DÜZELTMESİ: Veri kaynağındaki sütun adı olan "ID" kullanılıyor.
             int satisID = (int)dgvBorclar.Rows[selectedRowIndex].Cells["ID"].Value;
 
             decimal kalanBorc = ParseCurrencyInput(txtKalanBorc.Text);
@@ -263,30 +216,19 @@ namespace MarketStockTracking
             if (odenenMiktar > kalanBorc)
             {
                 DialogResult dr = MessageBox.Show(
-                    $"Girilen {odenenMiktar.ToString("N2", new CultureInfo("tr-TR"))} TL miktarı, kalan borç olan {kalanBorc.ToString("N2", new CultureInfo("tr-TR"))} TL'den fazladır.\n" +
-                    "Borç sıfırlanacak. Yine de devam etmek istiyor musunuz?",
-                    "Miktar Uyarısı",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning
+                    $"Girilen {odenenMiktar.ToString("N2", new CultureInfo("tr-TR"))} TL miktarı, kalan borç olan {kalanBorc.ToString("N2", new CultureInfo("tr-TR"))} TL'den fazladır.\nBorç sıfırlanacak. Yine de devam etmek istiyor musunuz?",
+                    "Miktar Uyarısı", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
                 );
-                if (dr == DialogResult.No)
-                {
-                    return;
-                }
+                if (dr == DialogResult.No) return;
             }
 
             decimal yeniBorc = Math.Max(0, kalanBorc - odenenMiktar);
 
             try
             {
-                if (conn.State == ConnectionState.Closed)
-                {
-                    conn.Open();
-                }
+                if (conn.State == ConnectionState.Closed) conn.Open();
 
-                // Pesin artırılır (yeni ödeme eklenir), Borc azaltılır (yeni borç kaydedilir).
-                string updateQuery = "UPDATE Satislar SET Pesin = Pesin + @OdenenMiktar, Borc = @YeniBorc WHERE ID = @SatisID";
-
+                string updateQuery = "UPDATE Sales SET CashPaid = CashPaid + @OdenenMiktar, Debt = @YeniBorc WHERE ID = @SatisID";
                 SqlCommand cmd = new SqlCommand(updateQuery, conn);
                 cmd.Parameters.AddWithValue("@OdenenMiktar", odenenMiktar);
                 cmd.Parameters.AddWithValue("@YeniBorc", yeniBorc);
@@ -297,9 +239,7 @@ namespace MarketStockTracking
                 if (affectedRows > 0)
                 {
                     MessageBox.Show($"Ödeme başarıyla alındı. Yeni Kalan Borç: {yeniBorc.ToString("N2", new CultureInfo("tr-TR"))} TL", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    LoadDebts(); // İşlem sonrası listeyi yeniden yükle
-
+                    LoadDebts();
                     txtKalanBorc.Text = "";
                     txtOdenenMiktar.Text = "";
                 }
@@ -332,7 +272,6 @@ namespace MarketStockTracking
 
                 try
                 {
-                    // DataTable oluştur
                     DataTable dt = new DataTable();
                     foreach (DataGridViewColumn col in dgvBorclar.Columns)
                         dt.Columns.Add(col.HeaderText);
@@ -347,18 +286,16 @@ namespace MarketStockTracking
                     {
                         var ws = workbook.Worksheets.Add("Borçlar");
 
-                        // Başlıkları yaz ve kalın yap
                         for (int i = 0; i < dgvBorclar.Columns.Count; i++)
                         {
                             var header = ws.Cell(1, i + 1);
                             header.Value = dgvBorclar.Columns[i].HeaderText;
                             header.Style.Font.Bold = true;
                             header.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                            header.Style.Fill.SetBackgroundColor(XLColor.FromArgb(220, 220, 220)); // Hafif gri
+                            header.Style.Fill.SetBackgroundColor(XLColor.FromArgb(220, 220, 220));
                             header.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                         }
 
-                        // Verileri yaz
                         for (int i = 0; i < dgvBorclar.Rows.Count; i++)
                         {
                             for (int j = 0; j < dgvBorclar.Columns.Count; j++)
@@ -373,8 +310,7 @@ namespace MarketStockTracking
 
                                 cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                                // Market sütunu sola, sayılar sağa hizalı
-                                if (j == 1) // Market sütun indexi, istersen dgvBorclar’da kontrol et
+                                if (j == 1) // Magaza sütunu sola
                                     cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
                                 else
                                     cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -382,21 +318,17 @@ namespace MarketStockTracking
                         }
 
                         ws.Columns().AdjustToContents();
-
                         workbook.SaveAs(sfd.FileName);
                     }
 
-                    MessageBox.Show("Borç listesi Excel dosyası olarak kaydedildi.",
-                        "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Borç listesi Excel dosyası olarak kaydedildi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Excel’e aktarılırken bir hata oluştu: " + ex.Message,
-                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Excel’e aktarılırken bir hata oluştu: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
-
 
         private void btnExportExcel_Click(object sender, EventArgs e)
         {

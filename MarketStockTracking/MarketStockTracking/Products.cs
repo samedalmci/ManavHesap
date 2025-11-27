@@ -38,7 +38,33 @@ namespace MarketStockTracking
         {
             var products = _productRepository.GetAll();
             dgvUrunler.DataSource = products;
+
+            // Sütun başlıklarını Türkçe yapalım
+            foreach (DataGridViewColumn col in dgvUrunler.Columns)
+            {
+                switch (col.Name)
+                {
+                    case "ProductName":
+                        col.HeaderText = "Ürün Adı";
+                        break;
+                    case "ProductType":
+                        col.HeaderText = "Ürün Çeşidi";
+                        break;
+                    case "Quantity":
+                        col.HeaderText = "Adet";
+                        col.DefaultCellStyle.Format = "N2"; // Sayıyı formatlamak için
+                        break;
+                    case "StoreName":
+                        col.HeaderText = "Mağaza";
+                        break;
+                    case "AddedDate":
+                        col.HeaderText = "Eklenme Tarihi";
+                        col.DefaultCellStyle.Format = "dd.MM.yyyy HH:mm"; // Tarih formatı
+                        break;
+                }
+            }
         }
+
 
         private void btnEkle_Click(object sender, EventArgs e)
         {
