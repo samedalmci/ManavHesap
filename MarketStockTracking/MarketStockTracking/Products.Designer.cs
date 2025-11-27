@@ -45,7 +45,6 @@
             txtUrunAdi.Name = "txtUrunAdi";
             txtUrunAdi.Size = new Size(161, 23);
             txtUrunAdi.TabIndex = 2;
-            txtUrunAdi.TextChanged += txtUrunAdi_TextChanged;
             // 
             // button1
             // 
