@@ -238,74 +238,74 @@ namespace MarketStockTracking
             txtBorc.ForeColor = kalan > 0 ? Color.Red : Color.Black;
         }
 
-private void SatisUrunler()
-{
-    try
-    {
-        if (conn.State == ConnectionState.Closed) conn.Open();
-        SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Sales", conn);
-        DataTable dt = new DataTable();
-        da.Fill(dt);
-        dgvUrunler.DataSource = dt;
-
-        // DataGridView formatlama ve başlıkları Türkçe yap
-        foreach (DataGridViewColumn col in dgvUrunler.Columns)
+        private void SatisUrunler()
         {
-            switch (col.Name)
+            try
             {
-                case "ProductName":
-                    col.HeaderText = "Ürün Adı";
-                    break;
-                case "StoreName":
-                    col.HeaderText = "Mağaza";
-                    break;
-                case "Quantity":
-                    col.HeaderText = "Adet";
-                    col.DefaultCellStyle.Format = "N2";
-                    break;
-                case "NetPrice":
-                    col.HeaderText = "Net Fiyat";
-                    col.DefaultCellStyle.Format = "N2";
-                    break;
-                case "CostPrice":
-                    col.HeaderText = "Alış Fiyatı";
-                    col.DefaultCellStyle.Format = "N2";
-                    break;
-                case "Profit":
-                    col.HeaderText = "Kar/Zarar";
-                    col.DefaultCellStyle.Format = "N2";
-                    break;
-                case "CashPaid":
-                    col.HeaderText = "Peşinat";
-                    col.DefaultCellStyle.Format = "N2";
-                    break;
-                case "Debt":
-                    col.HeaderText = "Borç";
-                    col.DefaultCellStyle.Format = "N2";
-                    break;
-                case "CreatedDate":
-                    col.HeaderText = "Tarih";
-                    col.DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
-                    break;
+                if (conn.State == ConnectionState.Closed) conn.Open();
+                SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Sales", conn);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                dgvUrunler.DataSource = dt;
+
+                // DataGridView formatlama ve başlıkları Türkçe yap
+                foreach (DataGridViewColumn col in dgvUrunler.Columns)
+                {
+                    switch (col.Name)
+                    {
+                        case "ProductName":
+                            col.HeaderText = "Ürün Adı";
+                            break;
+                        case "StoreName":
+                            col.HeaderText = "Mağaza";
+                            break;
+                        case "Quantity":
+                            col.HeaderText = "Adet";
+                            col.DefaultCellStyle.Format = "N2";
+                            break;
+                        case "NetPrice":
+                            col.HeaderText = "Net Fiyat";
+                            col.DefaultCellStyle.Format = "N2";
+                            break;
+                        case "CostPrice":
+                            col.HeaderText = "Alış Fiyatı";
+                            col.DefaultCellStyle.Format = "N2";
+                            break;
+                        case "Profit":
+                            col.HeaderText = "Kar/Zarar";
+                            col.DefaultCellStyle.Format = "N2";
+                            break;
+                        case "CashPaid":
+                            col.HeaderText = "Peşinat";
+                            col.DefaultCellStyle.Format = "N2";
+                            break;
+                        case "Debt":
+                            col.HeaderText = "Borç";
+                            col.DefaultCellStyle.Format = "N2";
+                            break;
+                        case "CreatedDate":
+                            col.HeaderText = "Tarih";
+                            col.DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
+                            break;
+                    }
+                }
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open) conn.Close();
             }
         }
-    }
-    finally
-    {
-        if (conn.State == ConnectionState.Open) conn.Close();
-    }
-}
 
 
-        private void txtNet_TextChanged(object sender, EventArgs e) { ProfitCalculation(); DebtCalculation(); }
-        private void txtBrut_TextChanged(object sender, EventArgs e) { ProfitCalculation(); }
-        private void txtPesin_TextChanged(object sender, EventArgs e) { DebtCalculation(); }
-        private void txtAdet_TextChanged(object sender, EventArgs e) { ProfitCalculation(); DebtCalculation(); }
+         private void txtNet_TextChanged(object sender, EventArgs e) { ProfitCalculation(); DebtCalculation(); }
+         private void txtBrut_TextChanged(object sender, EventArgs e) { ProfitCalculation(); }
+         private void txtPesin_TextChanged(object sender, EventArgs e) { DebtCalculation(); }
+         private void txtAdet_TextChanged(object sender, EventArgs e) { ProfitCalculation(); DebtCalculation(); }
 
-        private void txtBorc_TextChanged(object sender, EventArgs e) { }
+         private void txtBorc_TextChanged(object sender, EventArgs e) { }
 
-        private void ExportToExcel()
-        {
+         private void ExportToExcel()
+         {
             if (dgvUrunler.Rows.Count == 0) { MessageBox.Show("Dışa aktarılacak veri bulunamadı."); return; }
 
             using (SaveFileDialog sfd = new SaveFileDialog()
@@ -373,7 +373,8 @@ private void SatisUrunler()
                     MessageBox.Show("Excel aktarılırken hata: " + ex.Message);
                 }
             }
-        }
+
+         }
 
         private void btnExportExcel_Click(object sender, EventArgs e)
         {
