@@ -8,6 +8,8 @@ using System.Windows.Forms;
 using ClosedXML.Excel;
 using MarketStockTracking.Models;
 using MarketStockTracking.Repositories;
+using System.ComponentModel;
+
 
 namespace MarketStockTracking
 {
@@ -15,6 +17,8 @@ namespace MarketStockTracking
     {
         string baglanti = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;";
         SqlConnection conn;
+
+        BindingList<Sale> temporarySales = new BindingList<Sale>();
 
         public SellForm()
         {
@@ -52,7 +56,11 @@ namespace MarketStockTracking
 
             UrunleriYukle();
             MagazalariYukle();
-            SatisUrunler();
+
+
+            //SatisUrunler(); İlk başta veritabanından yükleme yerine geçici listeden yükleme yap
+
+            dgvUrunler.DataSource = temporarySales;
         }
 
         private void UrunleriYukle()
@@ -194,16 +202,10 @@ namespace MarketStockTracking
                     CreatedDate = DateTime.Now
                 };
 
-                SqlSalesRepository repo = new SqlSalesRepository(baglanti);
-                repo.Add(sale);
 
-                MessageBox.Show("Satış eklendi.");
-
-                // Fiş yazdır
-                ReceiptPrinter printer = new ReceiptPrinter(
-                    sale.ProductName, sale.Quantity, sale.NetPrice, sale.CashPaid, sale.Debt, sale.StoreName
-                );
-                printer.Bas();
+                temporarySales.Add(sale);
+                MessageBox.Show("Ürün listeye eklendi.");
+                CleanForm();
             }
             catch (Exception ex)
             {
@@ -211,8 +213,21 @@ namespace MarketStockTracking
             }
             finally
             {
-                SatisUrunler();
+                dgvUrunler.DataSource = temporarySales;
             }
+        }
+
+        private void CleanForm()
+        {
+            // Form alanlarını temizle
+            txtUrunAdi.SelectedIndex = 0;
+            txtMagza.SelectedIndex = 0;
+            txtAdet.Text = "";
+            txtNet.Text = "";
+            txtBrut.Text = "";
+            txtPesin.Text = "";
+            txtKarZarar.Text = "";
+            txtBorc.Text = "";
         }
 
         private void ProfitCalculation()
@@ -297,15 +312,15 @@ namespace MarketStockTracking
         }
 
 
-         private void txtNet_TextChanged(object sender, EventArgs e) { ProfitCalculation(); DebtCalculation(); }
-         private void txtBrut_TextChanged(object sender, EventArgs e) { ProfitCalculation(); }
-         private void txtPesin_TextChanged(object sender, EventArgs e) { DebtCalculation(); }
-         private void txtAdet_TextChanged(object sender, EventArgs e) { ProfitCalculation(); DebtCalculation(); }
+        private void txtNet_TextChanged(object sender, EventArgs e) { ProfitCalculation(); DebtCalculation(); }
+        private void txtBrut_TextChanged(object sender, EventArgs e) { ProfitCalculation(); }
+        private void txtPesin_TextChanged(object sender, EventArgs e) { DebtCalculation(); }
+        private void txtAdet_TextChanged(object sender, EventArgs e) { ProfitCalculation(); DebtCalculation(); }
 
-         private void txtBorc_TextChanged(object sender, EventArgs e) { }
+        private void txtBorc_TextChanged(object sender, EventArgs e) { }
 
-         private void ExportToExcel()
-         {
+        private void ExportToExcel()
+        {
             if (dgvUrunler.Rows.Count == 0) { MessageBox.Show("Dışa aktarılacak veri bulunamadı."); return; }
 
             using (SaveFileDialog sfd = new SaveFileDialog()
@@ -373,12 +388,43 @@ namespace MarketStockTracking
                     MessageBox.Show("Excel aktarılırken hata: " + ex.Message);
                 }
             }
-
-         }
+        }
 
         private void btnExportExcel_Click(object sender, EventArgs e)
         {
             ExportToExcel();
+        }
+
+        private void btnSatış_Click(object sender, EventArgs e)
+        {
+            if (temporarySales.Count == 0)
+            {
+                MessageBox.Show("Satış yapılacak ürün bulunamadı.");
+                return;
+            }
+
+            // Repo döngü dışında 
+            SqlSalesRepository repo = new SqlSalesRepository(baglanti);
+
+
+            // Her ürünü DB'ye kaydet
+            foreach (Sale sale in temporarySales)
+            {
+                repo.Add(sale);
+            }
+
+            MessageBox.Show("Tüm satışlar kaydedildi.");
+            temporarySales.Clear();
+        }
+
+        private void btnSatisGecmisi_Click(object sender, EventArgs e)
+        {
+            SatisUrunler();
+        }
+
+        private void btnGuncelUrun_Click(object sender, EventArgs e)
+        {
+            dgvUrunler.DataSource = temporarySales;
         }
     }
 }
