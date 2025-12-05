@@ -108,7 +108,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "Products";
-            Text = "X Manav Ürünler";
+            Text = "Yeşillikçi Mustafa Ürünler";
             ((System.ComponentModel.ISupportInitialize)dgvUrunler).EndInit();
             ResumeLayout(false);
             PerformLayout();

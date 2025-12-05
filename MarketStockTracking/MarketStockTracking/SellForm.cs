@@ -414,6 +414,8 @@ namespace MarketStockTracking
             }
 
             MessageBox.Show("Tüm satışlar kaydedildi.");
+            ReceiptPrinter printer = new ReceiptPrinter(temporarySales);
+            printer.Bas();
             temporarySales.Clear();
         }
 
@@ -425,6 +427,18 @@ namespace MarketStockTracking
         private void btnGuncelUrun_Click(object sender, EventArgs e)
         {
             dgvUrunler.DataSource = temporarySales;
+        }
+
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtBorc.Text) || txtBorc.Text == "0,00 TL")
+            {
+                MessageBox.Show("Borç yok.");
+                return;
+            }
+
+            txtPesin.Text = txtBorc.Text;
         }
     }
 }

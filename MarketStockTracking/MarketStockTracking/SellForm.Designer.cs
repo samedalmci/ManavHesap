@@ -51,6 +51,7 @@
             btnSatisGecmisi = new Button();
             btnGuncelUrun = new Button();
             btnSatış = new Button();
+            button2 = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvUrunler).BeginInit();
             SuspendLayout();
             // 
@@ -86,7 +87,7 @@
             // 
             label2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             label2.AutoSize = true;
-            label2.Location = new Point(141, 97);
+            label2.Location = new Point(141, 98);
             label2.Name = "label2";
             label2.Size = new Size(42, 15);
             label2.TabIndex = 5;
@@ -164,7 +165,7 @@
             // 
             button1.Anchor = AnchorStyles.Top;
             button1.ForeColor = Color.DarkGreen;
-            button1.Location = new Point(732, 39);
+            button1.Location = new Point(785, 39);
             button1.Name = "button1";
             button1.Size = new Size(112, 45);
             button1.TabIndex = 14;
@@ -176,7 +177,7 @@
             // 
             label9.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
             label9.AutoSize = true;
-            label9.Location = new Point(302, 173);
+            label9.Location = new Point(302, 172);
             label9.Name = "label9";
             label9.Size = new Size(62, 15);
             label9.TabIndex = 16;
@@ -237,7 +238,7 @@
             // 
             btnExportExcel.Anchor = AnchorStyles.Top;
             btnExportExcel.ForeColor = Color.DarkGreen;
-            btnExportExcel.Location = new Point(732, 201);
+            btnExportExcel.Location = new Point(785, 195);
             btnExportExcel.Name = "btnExportExcel";
             btnExportExcel.Size = new Size(112, 36);
             btnExportExcel.TabIndex = 22;
@@ -248,7 +249,7 @@
             // btnSatisGecmisi
             // 
             btnSatisGecmisi.ForeColor = Color.DarkGreen;
-            btnSatisGecmisi.Location = new Point(152, 217);
+            btnSatisGecmisi.Location = new Point(152, 208);
             btnSatisGecmisi.Name = "btnSatisGecmisi";
             btnSatisGecmisi.Size = new Size(110, 31);
             btnSatisGecmisi.TabIndex = 23;
@@ -259,7 +260,7 @@
             // btnGuncelUrun
             // 
             btnGuncelUrun.ForeColor = Color.DarkGreen;
-            btnGuncelUrun.Location = new Point(45, 217);
+            btnGuncelUrun.Location = new Point(45, 208);
             btnGuncelUrun.Name = "btnGuncelUrun";
             btnGuncelUrun.Size = new Size(101, 31);
             btnGuncelUrun.TabIndex = 24;
@@ -270,7 +271,7 @@
             // btnSatış
             // 
             btnSatış.ForeColor = Color.DarkGreen;
-            btnSatış.Location = new Point(732, 105);
+            btnSatış.Location = new Point(785, 105);
             btnSatış.Name = "btnSatış";
             btnSatış.Size = new Size(112, 45);
             btnSatış.TabIndex = 25;
@@ -278,12 +279,25 @@
             btnSatış.UseVisualStyleBackColor = true;
             btnSatış.Click += btnSatış_Click;
             // 
+            // button2
+            // 
+            button2.Font = new Font("Segoe MDL2 Assets", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            button2.ForeColor = Color.DarkRed;
+            button2.Location = new Point(686, 127);
+            button2.Name = "button2";
+            button2.Size = new Size(46, 22);
+            button2.TabIndex = 26;
+            button2.Text = "^";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
             // SellForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.WhiteSmoke;
             ClientSize = new Size(984, 661);
+            Controls.Add(button2);
             Controls.Add(btnSatış);
             Controls.Add(btnGuncelUrun);
             Controls.Add(btnSatisGecmisi);
@@ -309,7 +323,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(1000, 700);
             Name = "SellForm";
-            Text = "X Manav Satış";
+            Text = "Yeşillikçi Mustafa Satış";
             Load += SellForm_Load;
             ((System.ComponentModel.ISupportInitialize)dgvUrunler).EndInit();
             ResumeLayout(false);
@@ -339,5 +353,6 @@
         private Button btnSatisGecmisi;
         private Button btnGuncelUrun;
         private Button btnSatış;
+        private Button button2;
     }
 }

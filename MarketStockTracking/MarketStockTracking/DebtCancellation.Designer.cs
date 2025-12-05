@@ -139,7 +139,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "DebtCancellation";
-            Text = "X Manav Borç Ödeme";
+            Text = "Yeşillikçi Mustafa Borç Ödeme";
             ((System.ComponentModel.ISupportInitialize)dgvBorclar).EndInit();
             ResumeLayout(false);
             PerformLayout();

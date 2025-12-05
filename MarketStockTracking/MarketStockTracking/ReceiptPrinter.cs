@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Globalization;
+using MarketStockTracking.Models;
 
 namespace MarketStockTracking
 {
@@ -11,43 +13,58 @@ namespace MarketStockTracking
         private readonly CultureInfo trCulture = new CultureInfo("tr-TR");
 
         // Fişte kullanılacak veriler (Tek bir satış kaydı için)
-        public string IsletmeAdi { get; set; } = "X Manav";
-        public string Adres { get; set; } = "Dalyan, Atatürk Blv. 29/g, 48600 Ortaca/Muğla";
-        public string Telefon { get; set; } = "0252 XXX XX XX";
+        public string IsletmeAdi { get; set; } = "Yeşillikçi Mustafa";
+        public string Adres { get; set; } = "Muğla Ula";
+        public string Telefon { get; set; } = "0537 065 42 35"; 
         public string Sehir { get; set; } = "Muğla";
         public string YaziciAdi { get; set; } = "XPRINTER XP-Q805K"; // Varsayılan Yazıcınızın Windows'taki Adı
 
         // Satışa ait temel veriler
         public DateTime SatisTarihi { get; set; }
         public int SatisNo { get; set; } = 1; // Eğer veritabanından ID alınıyorsa buraya atanmalı
-        public string Kasiyer { get; set; } = "Mert Kıydan"; // Varsayılan Kasiyer
-        //public string UrunBarkod { get; set; }
-        public string UrunAdi { get; set; }
-        public string MagzaAdi { get; set; }
-        public decimal Adet { get; set; }
-        public decimal BirimFiyat { get; set; }
+        public string Kasiyer { get; set; } = "Mustafa Şimşek "; // Varsayılan Kasiyer
+                                                              
+        public List<Sale> Satislar { get; set; }
         public decimal ToplamTutar { get; set; }
+        public string MagzaAdi { get; set; }
         public decimal AlinanPara { get; set; }
         public decimal ParaUstu { get; set; }
         public decimal Borc { get; set; }
 
 
 
-        public ReceiptPrinter(string urunAdi, decimal adet, decimal birimFiyat, decimal pesin, decimal borc, string magzaAdi)
+        public ReceiptPrinter(BindingList<Sale> satislar)
         {
             this.SatisTarihi = DateTime.Now;
-            this.UrunAdi = urunAdi;
-            this.Adet = adet;
-            this.MagzaAdi = magzaAdi;
-            this.BirimFiyat = birimFiyat;
-            this.ToplamTutar = adet * birimFiyat;
-            this.AlinanPara = pesin;
-            this.Borc = borc;
+            this.Satislar = new List<Sale>(satislar);
 
-            // Eğer peşin ödenen miktar toplam tutardan fazlaysa, para üstü hesaplanır.
-            if (pesin > this.ToplamTutar && this.Borc == 0)
+
+            // Toplamları hesapla
+            decimal toplamTutar = 0;
+            decimal toplamPesinat = 0;
+            decimal toplamBorc = 0; 
+            
+            foreach (Sale sale in satislar)
             {
-                this.ParaUstu = pesin - this.ToplamTutar;
+                toplamTutar += sale.Quantity * sale.NetPrice;
+                toplamPesinat += sale.CashPaid;
+                toplamBorc += sale.Debt;
+            }
+
+            this.ToplamTutar = toplamTutar;
+            this.AlinanPara = toplamPesinat;
+            this.Borc = toplamBorc;
+
+            // Mağaza adı - ilk üründen al
+            if (satislar.Count > 0)
+            {
+                this.MagzaAdi = satislar[0].StoreName;
+            }
+
+            // Para üstü hesaplama
+            if (toplamPesinat > this.ToplamTutar && this.Borc == 0)
+            {
+                this.ParaUstu = toplamPesinat - this.ToplamTutar;
             }
             else
             {
@@ -157,17 +174,18 @@ namespace MarketStockTracking
             // 3. ÜRÜNLER (Görseldeki Formata Yakın)
             // ----------------------------------------------------
 
-            // Örnek Fişteki Ürün Satırını Oluşturma
-            // UrunAdi + (Adet X BirimFiyat)
-            string urunMiktar = $"{Adet.ToString("N3", trCulture).TrimEnd('0', ',')} X {BirimFiyat.ToString("N2", trCulture)}";
-            string urunSatiri = $"{UrunAdi}";
+            foreach (Sale sale in Satislar)
+            {
+                decimal urunToplam = sale.Quantity * sale.NetPrice;
+                string urunMiktar = $"{sale.Quantity.ToString("N3", trCulture).TrimEnd('0', ',')} X {sale.NetPrice.ToString("N2", trCulture)}";
 
-            g.DrawString(urunSatiri, fontUrun, Brushes.Black, leftMargin, y);
-            g.DrawString(ToplamTutar.ToString("N2", trCulture), fontUrun, Brushes.Black, rightMargin, y, rightAlign);
-            y += lineHeight;
+                g.DrawString(sale.ProductName, fontUrun, Brushes.Black, leftMargin, y);
+                g.DrawString(urunToplam.ToString("N2", trCulture), fontUrun, Brushes.Black, rightMargin, y, rightAlign);
+                y += lineHeight;
 
-            g.DrawString(urunMiktar, fontNormal, Brushes.Black, leftMargin + 5, y); // Hafif girinti
-            y += lineHeight;
+                g.DrawString(urunMiktar, fontNormal, Brushes.Black, leftMargin + 5, y);
+                y += lineHeight;
+            }
 
 
             // ----------------------------------------------------

@@ -89,7 +89,7 @@ namespace MarketStockTracking
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "Stores";
-            Text = "X Manav Mağazalar";
+            Text = "Yeşillikçi Mustafa Mağazalar";
             Load += Stores_Load;
             ((System.ComponentModel.ISupportInitialize)dgvMagazalar).EndInit();
             ResumeLayout(false);

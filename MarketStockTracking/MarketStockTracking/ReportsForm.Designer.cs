@@ -141,7 +141,7 @@
             Controls.Add(dtpStart);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "ReportsForm";
-            Text = "X Manav Rapor";
+            Text = "Yeşillikçi Mustafa Rapor";
             ((System.ComponentModel.ISupportInitialize)dgvReport).EndInit();
             ResumeLayout(false);
             PerformLayout();
