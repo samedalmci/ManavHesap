@@ -17,7 +17,7 @@ namespace MarketStockTracking
         public string Adres { get; set; } = "Muğla Ula";
         public string Telefon { get; set; } = "0537 065 42 35"; 
         public string Sehir { get; set; } = "Muğla";
-        public string YaziciAdi { get; set; } = "XPRINTER XP-Q805K"; // Varsayılan Yazıcınızın Windows'taki Adı
+        public string YaziciAdi { get; set; } = "Printer POS-80"; // Varsayılan Yazıcınızın Windows'taki Adı
 
         // Satışa ait temel veriler
         public DateTime SatisTarihi { get; set; }
@@ -77,11 +77,8 @@ namespace MarketStockTracking
             PrintDocument pd = new PrintDocument();
             pd.PrintPage += new PrintPageEventHandler(this.pd_PrintPage);
 
-            // Geliştirme/Test aşamasında Microsoft Print to PDF kullanmak için:
-            pd.PrinterSettings.PrinterName = "Microsoft Print to PDF";
-
             // Gerçek Yazıcı Kullanımı için (Yukarıdaki satırı yorum satırı yapın):
-            /*
+
             try
             {
                 pd.PrinterSettings.PrinterName = YaziciAdi;
@@ -90,8 +87,8 @@ namespace MarketStockTracking
             {
                 System.Windows.Forms.MessageBox.Show($"'{YaziciAdi}' adında bir yazıcı bulunamadı. Varsayılan yazıcıya gönderiliyor.", "Yazıcı Hatası", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
             }
-            */
-      
+
+
             pd.DefaultPageSettings.PaperSize = new PaperSize("80mm Receipt", 315, 1169); // Genişlik: 80mm
             pd.DefaultPageSettings.Margins = new Margins(5, 5, 5, 5); // Kenar boşluklarını azalt
 
