@@ -8,15 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using ClosedXML.Excel;
 
 namespace MarketStockTracking
 {
     public partial class DebtCancellation : Form
     {
-        private string baglanti = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;";
-        private SqlConnection conn;
+        private string baglanti = DatabaseHelper.ConnectionString;
+        private SqliteConnection conn;
 
         public DebtCancellation()
         {
@@ -32,7 +32,7 @@ namespace MarketStockTracking
 
             try
             {
-                conn = new SqlConnection(baglanti);
+                conn = new SqliteConnection(baglanti);
                 MagazalariYukle();
                 LoadDebts();
             }
@@ -47,8 +47,8 @@ namespace MarketStockTracking
             try
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT DISTINCT StoreName FROM Stores", conn);
-                SqlDataReader dr = cmd.ExecuteReader();
+                var cmd = new SqliteCommand("SELECT DISTINCT StoreName FROM Stores", conn);
+                var dr = cmd.ExecuteReader();
 
                 txtMagza.Items.Clear();
                 txtMagza.Items.Add("Tüm Mağazalar");
@@ -93,13 +93,15 @@ namespace MarketStockTracking
 
                 query += " ORDER BY CreatedDate DESC";
 
-                SqlCommand cmd = new SqlCommand(query, conn);
+                var cmd = new SqliteCommand(query, conn);
                 if (!string.IsNullOrEmpty(secilenMagaza))
                     cmd.Parameters.AddWithValue("@MagazaAdi", secilenMagaza);
 
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
-                da.Fill(dt);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    dt.Load(reader);
+                }
 
                 dgvBorclar.DataSource = dt;
 
@@ -206,7 +208,7 @@ namespace MarketStockTracking
             }
 
             int selectedRowIndex = dgvBorclar.SelectedRows[0].Index;
-            int satisID = (int)dgvBorclar.Rows[selectedRowIndex].Cells["ID"].Value;
+            int satisID = Convert.ToInt32(dgvBorclar.Rows[selectedRowIndex].Cells["ID"].Value);
 
             decimal kalanBorc = ParseCurrencyInput(txtKalanBorc.Text);
             decimal odenenMiktar = ParseCurrencyInput(txtOdenenMiktar.Text);
@@ -233,7 +235,7 @@ namespace MarketStockTracking
                 if (conn.State == ConnectionState.Closed) conn.Open();
 
                 string updateQuery = "UPDATE Sales SET CashPaid = CashPaid + @OdenenMiktar, Debt = @YeniBorc WHERE ID = @SatisID";
-                SqlCommand cmd = new SqlCommand(updateQuery, conn);
+                var cmd = new SqliteCommand(updateQuery, conn);
                 cmd.Parameters.AddWithValue("@OdenenMiktar", odenenMiktar);
                 cmd.Parameters.AddWithValue("@YeniBorc", yeniBorc);
                 cmd.Parameters.AddWithValue("@SatisID", satisID);
@@ -314,7 +316,7 @@ namespace MarketStockTracking
 
                                 cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                                if (j == 1) // Magaza sütunu sola
+                                if (j == 1)
                                     cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
                                 else
                                     cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -329,7 +331,7 @@ namespace MarketStockTracking
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Excel’e aktarılırken bir hata oluştu: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Excel'e aktarılırken bir hata oluştu: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

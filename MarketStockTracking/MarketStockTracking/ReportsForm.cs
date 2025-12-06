@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,7 +10,7 @@ namespace MarketStockTracking
 {
     public partial class ReportsForm : Form
     {
-        private string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;";
+        private string connectionString = DatabaseHelper.ConnectionString;
 
         public ReportsForm()
         {
@@ -39,8 +39,8 @@ namespace MarketStockTracking
             {
                 currentMode = mode;
 
-                DateTime startDate = dtpStart.Value.Date;
-                DateTime endDate = dtpEnd.Value.Date.AddDays(1).AddMilliseconds(-3);
+                string startDate = dtpStart.Value.Date.ToString("yyyy-MM-dd HH:mm:ss");
+                string endDate = dtpEnd.Value.Date.AddDays(1).AddMilliseconds(-3).ToString("yyyy-MM-dd HH:mm:ss");
 
                 string whereClause = " WHERE CreatedDate >= @StartDate AND CreatedDate < @EndDate ";
 
@@ -62,16 +62,18 @@ namespace MarketStockTracking
                 };
 
                 var table = new DataTable();
-                using (var conn = new SqlConnection(connectionString))
-                using (var cmd = new SqlCommand(sql, conn))
+                using (var conn = new SqliteConnection(connectionString))
                 {
-                    cmd.Parameters.AddWithValue("@StartDate", startDate);
-                    cmd.Parameters.AddWithValue("@EndDate", endDate);
-
-                    using (var da = new SqlDataAdapter(cmd))
+                    conn.Open();
+                    using (var cmd = new SqliteCommand(sql, conn))
                     {
-                        conn.Open();
-                        da.Fill(table);
+                        cmd.Parameters.AddWithValue("@StartDate", startDate);
+                        cmd.Parameters.AddWithValue("@EndDate", endDate);
+
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            table.Load(reader);
+                        }
                     }
                 }
 
@@ -258,6 +260,11 @@ namespace MarketStockTracking
         private void btnExcelExport_Click(object sender, EventArgs e)
         {
             ExportToExcel();
+        }
+
+        private void btnAdet_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

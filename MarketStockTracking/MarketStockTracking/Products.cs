@@ -2,9 +2,7 @@
 using System.Data;
 using System.Windows.Forms;
 using MarketStockTracking.Repositories;
-using Microsoft.Data.SqlClient;
 using MarketStockTracking.Models;
-
 
 namespace MarketStockTracking
 {
@@ -16,9 +14,7 @@ namespace MarketStockTracking
         {
             InitializeComponent();
 
-            _productRepository = new SqlProductRepository(
-                @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;"
-            );
+            _productRepository = new SqlProductRepository(DatabaseHelper.ConnectionString);
 
             txtUrunCesidi.DropDownStyle = ComboBoxStyle.DropDownList;
             txtUrunCesidi.Items.Clear();
@@ -39,7 +35,6 @@ namespace MarketStockTracking
             var products = _productRepository.GetAll();
             dgvUrunler.DataSource = products;
 
-            // Sütun başlıklarını Türkçe yapalım
             foreach (DataGridViewColumn col in dgvUrunler.Columns)
             {
                 switch (col.Name)
@@ -52,19 +47,18 @@ namespace MarketStockTracking
                         break;
                     case "Quantity":
                         col.HeaderText = "Adet";
-                        col.DefaultCellStyle.Format = "N2"; // Sayıyı formatlamak için
+                        col.DefaultCellStyle.Format = "N2";
                         break;
                     case "StoreName":
                         col.HeaderText = "Mağaza";
                         break;
                     case "AddedDate":
                         col.HeaderText = "Eklenme Tarihi";
-                        col.DefaultCellStyle.Format = "dd.MM.yyyy HH:mm"; // Tarih formatı
+                        col.DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
                         break;
                 }
             }
         }
-
 
         private void btnEkle_Click(object sender, EventArgs e)
         {
@@ -92,10 +86,8 @@ namespace MarketStockTracking
             if (result > 0)
             {
                 MessageBox.Show("Ürün başarıyla eklendi!");
-
                 txtUrunAdi.Clear();
                 txtUrunCesidi.SelectedIndex = 0;
-
                 ListeleUrunler();
             }
         }
@@ -118,7 +110,6 @@ namespace MarketStockTracking
             if (dr == DialogResult.No) return;
 
             int id = Convert.ToInt32(dgvUrunler.SelectedRows[0].Cells["ProductID"].Value);
-
             int result = _productRepository.Delete(id);
 
             if (result > 0)
@@ -126,7 +117,6 @@ namespace MarketStockTracking
                 MessageBox.Show("Ürün silindi.");
                 ListeleUrunler();
             }
-
         }
     }
 }

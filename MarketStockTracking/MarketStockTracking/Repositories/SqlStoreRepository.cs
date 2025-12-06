@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using MarketStockTracking.Models;
 
 namespace MarketStockTracking.Repositories
@@ -19,15 +16,13 @@ namespace MarketStockTracking.Repositories
 
         public List<Store> GetAll()
         {
-           var stores = new List<Store>();
-
-            using (SqlConnection conn = new SqlConnection(_connectionString)) 
-            { 
+            var stores = new List<Store>();
+            using (var conn = new SqliteConnection(_connectionString))
+            {
                 conn.Open();
                 var query = "SELECT StoreID, StoreName, StoreDate FROM Stores ORDER BY StoreDate DESC";
-
-                using (SqlCommand cmd = new SqlCommand(query, conn)) 
-                using (SqlDataReader rdr = cmd.ExecuteReader())
+                using (var cmd = new SqliteCommand(query, conn))
+                using (var rdr = cmd.ExecuteReader())
                 {
                     while (rdr.Read())
                     {
@@ -35,7 +30,7 @@ namespace MarketStockTracking.Repositories
                         {
                             StoreID = rdr.GetInt32(0),
                             StoreName = rdr.GetString(1),
-                            StoreDate = rdr.GetDateTime(2)
+                            StoreDate = DateTime.Parse(rdr.GetString(2))
                         });
                     }
                 }
@@ -45,30 +40,29 @@ namespace MarketStockTracking.Repositories
 
         public int Delete(int id)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (var conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("DELETE FROM Stores WHERE StoreID = @id", conn);
+                var cmd = new SqliteCommand("DELETE FROM Stores WHERE StoreID = @id", conn);
                 cmd.Parameters.AddWithValue("@id", id);
                 return cmd.ExecuteNonQuery();
             }
         }
+
         public int Add(Store store)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (var conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
                 var query = @"INSERT INTO Stores (StoreName, StoreDate) 
                               VALUES (@name, @date)";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (var cmd = new SqliteCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@name", store.StoreName);
-                    cmd.Parameters.AddWithValue("@date", store.StoreDate);
+                    cmd.Parameters.AddWithValue("@date", store.StoreDate.ToString("yyyy-MM-dd HH:mm:ss"));
                     return cmd.ExecuteNonQuery();
                 }
             }
         }
-
-
     }
 }

@@ -3,12 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|c:\\users\\samed\\desktop\\manavhesap\\marketstocktracking\\marketstocktracking\\receiptprinter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\receiptprinter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|c:\\users\\samed\\desktop\\manavhesap\\marketstocktracking\\marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\sellform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|c:\\users\\samed\\desktop\\manavhesap\\marketstocktracking\\marketstocktracking\\marketstocktracking.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{1C3B8155-5811-4E56-8286-B8E698FA80DE}|MarketStockTracking\\MarketStockTracking.csproj|solutionrelative:marketstocktracking\\marketstocktracking.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,27 +19,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "ReceiptPrinter.cs",
-              "DocumentMoniker": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\ReceiptPrinter.cs",
-              "RelativeDocumentMoniker": "MarketStockTracking\\ReceiptPrinter.cs",
-              "ToolTip": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\ReceiptPrinter.cs",
-              "RelativeToolTip": "MarketStockTracking\\ReceiptPrinter.cs",
-              "ViewState": "AgIAADsAAAAAAAAAAAAqwFAAAABGAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-06T11:14:59.664Z",
+              "Title": "MarketStockTracking",
+              "DocumentMoniker": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\MarketStockTracking.csproj",
+              "RelativeDocumentMoniker": "MarketStockTracking\\MarketStockTracking.csproj",
+              "ToolTip": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\MarketStockTracking.csproj",
+              "RelativeToolTip": "MarketStockTracking\\MarketStockTracking.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-12-06T20:18:17.707Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "SellForm.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\SellForm.cs",
-              "RelativeDocumentMoniker": "MarketStockTracking\\SellForm.cs",
-              "ToolTip": "C:\\Users\\samed\\Desktop\\ManavHesap\\MarketStockTracking\\MarketStockTracking\\SellForm.cs [Design]",
-              "RelativeToolTip": "MarketStockTracking\\SellForm.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-06T11:14:58.275Z",
-              "EditorCaption": " [Design]"
             }
           ]
         }

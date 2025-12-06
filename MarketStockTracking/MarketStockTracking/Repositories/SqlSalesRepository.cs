@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Data.Sqlite;
 using MarketStockTracking.Models;
-using Microsoft.Data.SqlClient;
 
 namespace MarketStockTracking.Repositories
 {
@@ -17,61 +17,58 @@ namespace MarketStockTracking.Repositories
         public List<Sale> GetAll()
         {
             var sales = new List<Sale>();
-
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (var conn = new SqliteConnection(_connectionString))
             {
-                string query = "SELECT * FROM Sales ORDER BY ID DESC";
-                SqlCommand cmd = new SqlCommand(query, conn);
-
                 conn.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                string query = "SELECT * FROM Sales ORDER BY ID DESC";
+                using (var cmd = new SqliteCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    sales.Add(new Sale
+                    while (reader.Read())
                     {
-                        ID = Convert.ToInt32(reader["ID"]),
-                        ProductName = reader["ProductName"].ToString(),
-                        StoreName = reader["StoreName"].ToString(),
-                        Quantity = Convert.ToDecimal(reader["Quantity"]),
-                        NetPrice = Convert.ToDecimal(reader["NetPrice"]),
-                        GrossPrice = Convert.ToDecimal(reader["GrossPrice"]),
-                        Profit = Convert.ToDecimal(reader["Profit"]),
-                        CashPaid = Convert.ToDecimal(reader["CashPaid"]),
-                        Debt = Convert.ToDecimal(reader["Debt"]),
-                        CreatedDate = Convert.ToDateTime(reader["CreatedDate"])
-                    });
+                        sales.Add(new Sale
+                        {
+                            ID = Convert.ToInt32(reader["ID"]),
+                            ProductName = reader["ProductName"].ToString(),
+                            StoreName = reader["StoreName"].ToString(),
+                            Quantity = Convert.ToDecimal(reader["Quantity"]),
+                            NetPrice = Convert.ToDecimal(reader["NetPrice"]),
+                            GrossPrice = Convert.ToDecimal(reader["GrossPrice"]),
+                            Profit = Convert.ToDecimal(reader["Profit"]),
+                            CashPaid = Convert.ToDecimal(reader["CashPaid"]),
+                            Debt = Convert.ToDecimal(reader["Debt"]),
+                            CreatedDate = DateTime.Parse(reader["CreatedDate"].ToString())
+                        });
+                    }
                 }
             }
-
             return sales;
         }
 
         public int Add(Sale sale)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (var conn = new SqliteConnection(_connectionString))
             {
+                conn.Open();
                 string query = @"
                     INSERT INTO Sales
                     (ProductName, StoreName, Quantity, NetPrice, GrossPrice, Profit, CashPaid, Debt, CreatedDate)
                     VALUES
                     (@ProductName, @StoreName, @Quantity, @NetPrice, @GrossPrice, @Profit, @CashPaid, @Debt, @CreatedDate)
                 ";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-
-                cmd.Parameters.AddWithValue("@ProductName", sale.ProductName);
-                cmd.Parameters.AddWithValue("@StoreName", sale.StoreName);
-                cmd.Parameters.AddWithValue("@Quantity", sale.Quantity);
-                cmd.Parameters.AddWithValue("@NetPrice", sale.NetPrice);
-                cmd.Parameters.AddWithValue("@GrossPrice", sale.GrossPrice);
-                cmd.Parameters.AddWithValue("@Profit", sale.Profit);
-                cmd.Parameters.AddWithValue("@CashPaid", sale.CashPaid);
-                cmd.Parameters.AddWithValue("@Debt", sale.Debt);
-                cmd.Parameters.AddWithValue("@CreatedDate", sale.CreatedDate);
-
-                conn.Open();
-                return cmd.ExecuteNonQuery();
+                using (var cmd = new SqliteCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ProductName", sale.ProductName);
+                    cmd.Parameters.AddWithValue("@StoreName", sale.StoreName);
+                    cmd.Parameters.AddWithValue("@Quantity", sale.Quantity);
+                    cmd.Parameters.AddWithValue("@NetPrice", sale.NetPrice);
+                    cmd.Parameters.AddWithValue("@GrossPrice", sale.GrossPrice);
+                    cmd.Parameters.AddWithValue("@Profit", sale.Profit);
+                    cmd.Parameters.AddWithValue("@CashPaid", sale.CashPaid);
+                    cmd.Parameters.AddWithValue("@Debt", sale.Debt);
+                    cmd.Parameters.AddWithValue("@CreatedDate", sale.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss"));
+                    return cmd.ExecuteNonQuery();
+                }
             }
         }
     }

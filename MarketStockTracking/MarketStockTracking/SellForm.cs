@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.Sqlite;
 using System;
 using System.Data;
 using System.Drawing;
@@ -10,16 +10,16 @@ using MarketStockTracking.Models;
 using MarketStockTracking.Repositories;
 using System.ComponentModel;
 
-
 namespace MarketStockTracking
 {
     public partial class SellForm : Form
     {
-        string baglanti = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;";
-        SqlConnection conn;
+        string baglanti = DatabaseHelper.ConnectionString;
+        SqliteConnection conn;
 
         BindingList<Sale> temporarySales = new BindingList<Sale>();
         bool guncelUrunlerGoruntusunde = true;
+
         public SellForm()
         {
             InitializeComponent();
@@ -37,7 +37,7 @@ namespace MarketStockTracking
 
         private void SellForm_Load(object sender, EventArgs e)
         {
-            conn = new SqlConnection(baglanti);
+            conn = new SqliteConnection(baglanti);
 
             txtBorc.ReadOnly = true;
 
@@ -57,7 +57,6 @@ namespace MarketStockTracking
             UrunleriYukle();
             MagazalariYukle();
 
-            //İlk başta veritabanından yükleme yerine geçici listeden yükleme yap
             dgvUrunler.DataSource = temporarySales;
         }
 
@@ -66,8 +65,8 @@ namespace MarketStockTracking
             try
             {
                 if (conn.State == ConnectionState.Closed) conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT ProductName FROM Products", conn);
-                SqlDataReader dr = cmd.ExecuteReader();
+                var cmd = new SqliteCommand("SELECT ProductName FROM Products", conn);
+                var dr = cmd.ExecuteReader();
 
                 txtUrunAdi.Items.Clear();
                 txtUrunAdi.Items.Add("Seçiniz...");
@@ -89,8 +88,8 @@ namespace MarketStockTracking
             try
             {
                 if (conn.State == ConnectionState.Closed) conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT StoreName FROM Stores", conn);
-                SqlDataReader dr = cmd.ExecuteReader();
+                var cmd = new SqliteCommand("SELECT StoreName FROM Stores", conn);
+                var dr = cmd.ExecuteReader();
 
                 txtMagza.Items.Clear();
                 txtMagza.Items.Add("Seçiniz...");
@@ -200,7 +199,6 @@ namespace MarketStockTracking
                     CreatedDate = DateTime.Now
                 };
 
-
                 temporarySales.Add(sale);
                 MessageBox.Show("Ürün listeye eklendi.");
                 CleanForm();
@@ -217,7 +215,6 @@ namespace MarketStockTracking
 
         private void CleanForm()
         {
-            // Form alanlarını temizle
             txtUrunAdi.SelectedIndex = 0;
             txtMagza.SelectedIndex = 0;
             txtAdet.Text = "";
@@ -256,12 +253,18 @@ namespace MarketStockTracking
             try
             {
                 if (conn.State == ConnectionState.Closed) conn.Open();
-                SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Sales", conn);
+
                 DataTable dt = new DataTable();
-                da.Fill(dt);
+                string query = "SELECT * FROM Sales";
+
+                using (var cmd = new SqliteCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    dt.Load(reader);
+                }
+
                 dgvUrunler.DataSource = dt;
 
-                // DataGridView formatlama ve başlıkları Türkçe yap
                 foreach (DataGridViewColumn col in dgvUrunler.Columns)
                 {
                     switch (col.Name)
@@ -280,7 +283,7 @@ namespace MarketStockTracking
                             col.HeaderText = "Net Fiyat";
                             col.DefaultCellStyle.Format = "N2";
                             break;
-                        case "CostPrice":
+                        case "GrossPrice":
                             col.HeaderText = "Alış Fiyatı";
                             col.DefaultCellStyle.Format = "N2";
                             break;
@@ -308,7 +311,6 @@ namespace MarketStockTracking
                 if (conn.State == ConnectionState.Open) conn.Close();
             }
         }
-
 
         private void txtNet_TextChanged(object sender, EventArgs e) { ProfitCalculation(); DebtCalculation(); }
         private void txtBrut_TextChanged(object sender, EventArgs e) { ProfitCalculation(); }
@@ -401,11 +403,8 @@ namespace MarketStockTracking
                 return;
             }
 
-            // Repo döngü dışında 
             SqlSalesRepository repo = new SqlSalesRepository(baglanti);
 
-
-            // Her ürünü DB'ye kaydet
             foreach (Sale sale in temporarySales)
             {
                 repo.Add(sale);
@@ -429,7 +428,6 @@ namespace MarketStockTracking
             guncelUrunlerGoruntusunde = true;
         }
 
-
         private void button2_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtBorc.Text) || txtBorc.Text == "0,00 TL")
@@ -445,25 +443,21 @@ namespace MarketStockTracking
         {
             string onaykutusu = "";
 
-            // Seçili satır var mı kontrol et
             if (dgvUrunler.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Lütfen silmek istediğiniz satırı seçin.");
                 return;
             }
 
-
-            if (guncelUrunlerGoruntusunde == true) 
+            if (guncelUrunlerGoruntusunde == true)
             {
                 onaykutusu = "Seçili satır sepetten silinecek. Silmek istediğinize emin misiniz?";
-
             }
             else
             {
-                onaykutusu = "Seçili satırı veri tabanından kalıcı olarak silinecek. Silmek istediğinize emin misiniz?";
+                onaykutusu = "Seçili satır veri tabanından kalıcı olarak silinecek. Silmek istediğinize emin misiniz?";
             }
 
-            // Onay iste
             DialogResult dr = MessageBox.Show(
                 onaykutusu,
                 "Silme Onayı",
@@ -471,30 +465,26 @@ namespace MarketStockTracking
                 MessageBoxIcon.Warning
             );
 
-
             if (dr == DialogResult.No) return;
 
-            // Hangi görünümdeyiz?
             if (guncelUrunlerGoruntusunde)
             {
-                // Bellekten sil
                 int index = dgvUrunler.SelectedRows[0].Index;
                 temporarySales.RemoveAt(index);
             }
             else
             {
-                // DB'den sil
                 int id = Convert.ToInt32(dgvUrunler.SelectedRows[0].Cells["ID"].Value);
 
                 try
                 {
                     if (conn.State == ConnectionState.Closed) conn.Open();
-                    SqlCommand cmd = new SqlCommand("DELETE FROM Sales WHERE ID = @id", conn);
+                    var cmd = new SqliteCommand("DELETE FROM Sales WHERE ID = @id", conn);
                     cmd.Parameters.AddWithValue("@id", id);
                     cmd.ExecuteNonQuery();
 
                     MessageBox.Show("Satış silindi.");
-                    SatisUrunler(); // Tabloyu yenile
+                    SatisUrunler();
                 }
                 catch (Exception ex)
                 {

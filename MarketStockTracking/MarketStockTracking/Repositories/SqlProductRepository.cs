@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using MarketStockTracking.Models;
 
 namespace MarketStockTracking.Repositories
@@ -18,15 +17,12 @@ namespace MarketStockTracking.Repositories
         public List<Product> GetAll()
         {
             var products = new List<Product>();
-
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (var conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
-
                 var query = "SELECT ProductID, ProductName, ProductType, AddedDate FROM Products ORDER BY AddedDate DESC";
-
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                using (SqlDataReader rdr = cmd.ExecuteReader())
+                using (var cmd = new SqliteCommand(query, conn))
+                using (var rdr = cmd.ExecuteReader())
                 {
                     while (rdr.Read())
                     {
@@ -35,21 +31,20 @@ namespace MarketStockTracking.Repositories
                             ProductID = rdr.GetInt32(0),
                             ProductName = rdr.GetString(1),
                             ProductType = rdr.GetString(2),
-                            AddedDate = rdr.GetDateTime(3)
+                            AddedDate = DateTime.Parse(rdr.GetString(3))
                         });
                     }
                 }
             }
-
             return products;
         }
 
         public int Delete(int id)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (var conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("DELETE FROM Products WHERE ProductID = @id", conn);
+                var cmd = new SqliteCommand("DELETE FROM Products WHERE ProductID = @id", conn);
                 cmd.Parameters.AddWithValue("@id", id);
                 return cmd.ExecuteNonQuery();
             }
@@ -57,19 +52,16 @@ namespace MarketStockTracking.Repositories
 
         public int Add(Product product)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (var conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
-
                 var query = @"INSERT INTO Products (ProductName, ProductType, AddedDate) 
                               VALUES (@name, @type, @date)";
-
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (var cmd = new SqliteCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@name", product.ProductName);
                     cmd.Parameters.AddWithValue("@type", product.ProductType);
-                    cmd.Parameters.AddWithValue("@date", product.AddedDate);
-
+                    cmd.Parameters.AddWithValue("@date", product.AddedDate.ToString("yyyy-MM-dd HH:mm:ss"));
                     return cmd.ExecuteNonQuery();
                 }
             }

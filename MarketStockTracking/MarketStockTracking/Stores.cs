@@ -14,9 +14,7 @@ namespace MarketStockTracking
             InitializeComponent();
 
             // Repository oluştur
-            _storeRepository = new SqlStoreRepository(
-                @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ProductStokDB;Integrated Security=True;"
-            );
+            _storeRepository = new SqlStoreRepository(DatabaseHelper.ConnectionString);
         }
 
         // Form Load event
