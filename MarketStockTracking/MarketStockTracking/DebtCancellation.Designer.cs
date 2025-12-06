@@ -38,6 +38,7 @@
             label2 = new Label();
             label3 = new Label();
             btnExportExcel = new Button();
+            button2 = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvBorclar).BeginInit();
             SuspendLayout();
             // 
@@ -121,11 +122,25 @@
             btnExportExcel.UseVisualStyleBackColor = true;
             btnExportExcel.Click += btnExportExcel_Click;
             // 
+            // button2
+            // 
+            button2.Anchor = AnchorStyles.Top;
+            button2.Font = new Font("Segoe MDL2 Assets", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            button2.ForeColor = Color.DarkRed;
+            button2.Location = new Point(449, 50);
+            button2.Name = "button2";
+            button2.Size = new Size(46, 22);
+            button2.TabIndex = 27;
+            button2.Text = "<";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
             // DebtCancellation
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(650, 407);
+            Controls.Add(button2);
             Controls.Add(btnExportExcel);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -156,5 +171,6 @@
         private Label label2;
         private Label label3;
         private Button btnExportExcel;
+        private Button button2;
     }
 }

@@ -34,6 +34,7 @@ namespace MarketStockTracking
             btnEkle = new Button();
             txtStoreName = new TextBox();
             label1 = new Label();
+            btnSil = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvMagazalar).BeginInit();
             SuspendLayout();
             // 
@@ -76,11 +77,24 @@ namespace MarketStockTracking
             label1.TabIndex = 11;
             label1.Text = "Mağaza İsmi";
             // 
+            // btnSil
+            // 
+            btnSil.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 162);
+            btnSil.ForeColor = Color.Red;
+            btnSil.Location = new Point(4, 228);
+            btnSil.Name = "btnSil";
+            btnSil.Size = new Size(34, 41);
+            btnSil.TabIndex = 29;
+            btnSil.Text = "X";
+            btnSil.UseVisualStyleBackColor = true;
+            btnSil.Click += btnSil_Click;
+            // 
             // Stores
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(500, 450);
+            Controls.Add(btnSil);
             Controls.Add(label1);
             Controls.Add(dgvMagazalar);
             Controls.Add(btnEkle);
@@ -102,5 +116,6 @@ namespace MarketStockTracking
         private Button btnEkle;
         private TextBox txtStoreName;
         private Label label1;
+        private Button btnSil;
     }
 }

@@ -36,6 +36,7 @@
             txtUrunCesidi = new ComboBox();
             label1 = new Label();
             label2 = new Label();
+            btnSil = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvUrunler).BeginInit();
             SuspendLayout();
             // 
@@ -93,11 +94,24 @@
             label2.TabIndex = 8;
             label2.Text = "Ürün Çeşidi";
             // 
+            // btnSil
+            // 
+            btnSil.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 162);
+            btnSil.ForeColor = Color.Red;
+            btnSil.Location = new Point(7, 199);
+            btnSil.Name = "btnSil";
+            btnSil.Size = new Size(34, 41);
+            btnSil.TabIndex = 28;
+            btnSil.Text = "X";
+            btnSil.UseVisualStyleBackColor = true;
+            btnSil.Click += btnSil_Click;
+            // 
             // Products
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(527, 411);
+            Controls.Add(btnSil);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(dgvUrunler);
@@ -122,5 +136,6 @@
         private ComboBox txtUrunCesidi;
         private Label label1;
         private Label label2;
+        private Button btnSil;
     }
 }

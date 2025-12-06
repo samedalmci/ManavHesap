@@ -12,5 +12,7 @@ namespace MarketStockTracking.Repositories
         List<Store> GetAll();
 
         int Add(Store store);
+
+        int Delete(int id);
     }
 }

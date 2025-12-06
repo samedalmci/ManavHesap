@@ -10,7 +10,7 @@ namespace MarketStockTracking
 {
     public partial class Products : Form
     {
-        private readonly IProductRepository _productRepository;          
+        private readonly IProductRepository _productRepository;
 
         public Products()
         {
@@ -27,7 +27,7 @@ namespace MarketStockTracking
             txtUrunCesidi.Items.Add("Meyve");
             txtUrunCesidi.SelectedIndex = 0;
 
-            ListeleUrunler(); 
+            ListeleUrunler();
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -98,6 +98,35 @@ namespace MarketStockTracking
 
                 ListeleUrunler();
             }
+        }
+
+        private void btnSil_Click(object sender, EventArgs e)
+        {
+            if (dgvUrunler.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Lütfen silmek istediğiniz satırı seçin.");
+                return;
+            }
+
+            DialogResult dr = MessageBox.Show(
+                "Seçili ürün veri tabanından kalıcı olarak silinecek. Silmek istediğinize emin misiniz?",
+                "Silme Onayı",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (dr == DialogResult.No) return;
+
+            int id = Convert.ToInt32(dgvUrunler.SelectedRows[0].Cells["ProductID"].Value);
+
+            int result = _productRepository.Delete(id);
+
+            if (result > 0)
+            {
+                MessageBox.Show("Ürün silindi.");
+                ListeleUrunler();
+            }
+
         }
     }
 }

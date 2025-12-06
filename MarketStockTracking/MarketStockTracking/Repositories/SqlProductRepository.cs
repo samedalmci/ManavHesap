@@ -44,6 +44,17 @@ namespace MarketStockTracking.Repositories
             return products;
         }
 
+        public int Delete(int id)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("DELETE FROM Products WHERE ProductID = @id", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                return cmd.ExecuteNonQuery();
+            }
+        }
+
         public int Add(Product product)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

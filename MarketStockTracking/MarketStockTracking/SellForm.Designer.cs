@@ -52,6 +52,7 @@
             btnGuncelUrun = new Button();
             btnSatış = new Button();
             button2 = new Button();
+            btnSil = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvUrunler).BeginInit();
             SuspendLayout();
             // 
@@ -225,6 +226,7 @@
             // dgvUrunler
             // 
             dgvUrunler.AllowUserToAddRows = false;
+            dgvUrunler.AllowUserToDeleteRows = false;
             dgvUrunler.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvUrunler.BackgroundColor = SystemColors.MenuBar;
             dgvUrunler.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -270,6 +272,7 @@
             // 
             // btnSatış
             // 
+            btnSatış.Anchor = AnchorStyles.Top;
             btnSatış.ForeColor = Color.DarkGreen;
             btnSatış.Location = new Point(785, 105);
             btnSatış.Name = "btnSatış";
@@ -281,6 +284,7 @@
             // 
             // button2
             // 
+            button2.Anchor = AnchorStyles.Top;
             button2.Font = new Font("Segoe MDL2 Assets", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button2.ForeColor = Color.DarkRed;
             button2.Location = new Point(686, 127);
@@ -291,12 +295,25 @@
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
+            // btnSil
+            // 
+            btnSil.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 162);
+            btnSil.ForeColor = Color.Red;
+            btnSil.Location = new Point(3, 245);
+            btnSil.Name = "btnSil";
+            btnSil.Size = new Size(34, 41);
+            btnSil.TabIndex = 27;
+            btnSil.Text = "X";
+            btnSil.UseVisualStyleBackColor = true;
+            btnSil.Click += btnSil_Click;
+            // 
             // SellForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.WhiteSmoke;
             ClientSize = new Size(984, 661);
+            Controls.Add(btnSil);
             Controls.Add(button2);
             Controls.Add(btnSatış);
             Controls.Add(btnGuncelUrun);
@@ -354,5 +371,6 @@
         private Button btnGuncelUrun;
         private Button btnSatış;
         private Button button2;
+        private Button btnSil;
     }
 }

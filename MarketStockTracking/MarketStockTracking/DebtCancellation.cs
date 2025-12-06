@@ -136,7 +136,11 @@ namespace MarketStockTracking
             try
             {
                 DataGridViewRow selectedRow = dgvBorclar.Rows[e.RowIndex];
+
+                string magazaAdi = selectedRow.Cells["Magaza"].Value.ToString();
                 string kalanBorcString = selectedRow.Cells["Kalan Borç Tutarı"].Value.ToString();
+
+                txtMagza.Text = magazaAdi;
                 txtKalanBorc.Text = kalanBorcString + " TL";
                 txtOdenenMiktar.Text = "";
             }
@@ -333,6 +337,17 @@ namespace MarketStockTracking
         private void btnExportExcel_Click(object sender, EventArgs e)
         {
             ExportToExcel();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtKalanBorc.Text) || txtKalanBorc.Text == "0,00 TL")
+            {
+                MessageBox.Show("Borç yok.");
+                return;
+            }
+
+            txtOdenenMiktar.Text = txtKalanBorc.Text;
         }
     }
 }

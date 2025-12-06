@@ -84,5 +84,33 @@ namespace MarketStockTracking
                 LoadStores();
             }
         }
+
+        private void btnSil_Click(object sender, EventArgs e)
+        {
+            if (dgvMagazalar.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Lütfen silmek istediğiniz satırı seçin.");
+                return;
+            }
+
+            DialogResult dr = MessageBox.Show(
+                "Seçili mağaza veri tabanından kalıcı olarak silinecek. Silmek istediğinize emin misiniz?",
+                "Silme Onayı",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (dr == DialogResult.No) return;
+
+            int id = Convert.ToInt32(dgvMagazalar.SelectedRows[0].Cells["StoreID"].Value);
+
+            int result = _storeRepository.Delete(id);
+
+            if (result > 0)
+            {
+                MessageBox.Show("Mağaza silindi.");
+                LoadStores();
+            }
+        }
     }
 }

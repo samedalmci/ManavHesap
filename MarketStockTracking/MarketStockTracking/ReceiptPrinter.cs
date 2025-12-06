@@ -91,10 +91,7 @@ namespace MarketStockTracking
                 System.Windows.Forms.MessageBox.Show($"'{YaziciAdi}' adında bir yazıcı bulunamadı. Varsayılan yazıcıya gönderiliyor.", "Yazıcı Hatası", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
             }
             */
-
-            // **80mm Fiş (3.15 inç x 11.69 inç (uzun)) için kağıt boyutunu ayarla**
-            // Genişlik: 3.15 inç * 100 DPI = ~315 (Windows Forms varsayılan birimi inç/100)
-            // Yükseklik: Çok uzun yapıyoruz ki tek sayfaya sığsın
+      
             pd.DefaultPageSettings.PaperSize = new PaperSize("80mm Receipt", 315, 1169); // Genişlik: 80mm
             pd.DefaultPageSettings.Margins = new Margins(5, 5, 5, 5); // Kenar boşluklarını azalt
 

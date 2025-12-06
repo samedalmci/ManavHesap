@@ -19,7 +19,7 @@ namespace MarketStockTracking
         SqlConnection conn;
 
         BindingList<Sale> temporarySales = new BindingList<Sale>();
-
+        bool guncelUrunlerGoruntusunde = true;
         public SellForm()
         {
             InitializeComponent();
@@ -57,9 +57,7 @@ namespace MarketStockTracking
             UrunleriYukle();
             MagazalariYukle();
 
-
-            //SatisUrunler(); İlk başta veritabanından yükleme yerine geçici listeden yükleme yap
-
+            //İlk başta veritabanından yükleme yerine geçici listeden yükleme yap
             dgvUrunler.DataSource = temporarySales;
         }
 
@@ -422,11 +420,13 @@ namespace MarketStockTracking
         private void btnSatisGecmisi_Click(object sender, EventArgs e)
         {
             SatisUrunler();
+            guncelUrunlerGoruntusunde = false;
         }
 
         private void btnGuncelUrun_Click(object sender, EventArgs e)
         {
             dgvUrunler.DataSource = temporarySales;
+            guncelUrunlerGoruntusunde = true;
         }
 
 
@@ -439,6 +439,72 @@ namespace MarketStockTracking
             }
 
             txtPesin.Text = txtBorc.Text;
+        }
+
+        private void btnSil_Click(object sender, EventArgs e)
+        {
+            string onaykutusu = "";
+
+            // Seçili satır var mı kontrol et
+            if (dgvUrunler.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Lütfen silmek istediğiniz satırı seçin.");
+                return;
+            }
+
+
+            if (guncelUrunlerGoruntusunde == true) 
+            {
+                onaykutusu = "Seçili satır sepetten silinecek. Silmek istediğinize emin misiniz?";
+
+            }
+            else
+            {
+                onaykutusu = "Seçili satırı veri tabanından kalıcı olarak silinecek. Silmek istediğinize emin misiniz?";
+            }
+
+            // Onay iste
+            DialogResult dr = MessageBox.Show(
+                onaykutusu,
+                "Silme Onayı",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+
+            if (dr == DialogResult.No) return;
+
+            // Hangi görünümdeyiz?
+            if (guncelUrunlerGoruntusunde)
+            {
+                // Bellekten sil
+                int index = dgvUrunler.SelectedRows[0].Index;
+                temporarySales.RemoveAt(index);
+            }
+            else
+            {
+                // DB'den sil
+                int id = Convert.ToInt32(dgvUrunler.SelectedRows[0].Cells["ID"].Value);
+
+                try
+                {
+                    if (conn.State == ConnectionState.Closed) conn.Open();
+                    SqlCommand cmd = new SqlCommand("DELETE FROM Sales WHERE ID = @id", conn);
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.ExecuteNonQuery();
+
+                    MessageBox.Show("Satış silindi.");
+                    SatisUrunler(); // Tabloyu yenile
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Hata: " + ex.Message);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open) conn.Close();
+                }
+            }
         }
     }
 }
