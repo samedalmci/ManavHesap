@@ -103,12 +103,14 @@ namespace MarketStockTracking
             }
 
             // Kağıt yüksekliğini içeriğe göre hesapla
-            int sabitSatirlar = 18; // İşletme bilgileri, tarih, toplam vs.
-            int urunSatirlari = Satislar.Count * 2; // Her ürün 2 satır
+            int sabitSatirlar = 18;
+            int urunSatirlari = Satislar.Count * 2;
             int toplamSatir = sabitSatirlar + urunSatirlari;
-            int kagitYuksekligi = toplamSatir * 20; // Her satır ~20 piksel
+            int altBosluk = 60; // Parmak kadar boşluk
+            int kagitYuksekligi = (toplamSatir * 20) + altBosluk;
 
             pd.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 315, kagitYuksekligi);
+
             pd.DefaultPageSettings.Margins = new Margins(5, 5, 5, 5);
 
             pd.Print();
