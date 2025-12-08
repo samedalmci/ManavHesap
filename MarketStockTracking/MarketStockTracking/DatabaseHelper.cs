@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
+using System.IO;
 
 namespace MarketStockTracking
 {
@@ -22,8 +18,9 @@ namespace MarketStockTracking
             {
                 conn.Open();
 
-                // Products tablosu
                 var cmd = conn.CreateCommand();
+
+                // Products tablosu
                 cmd.CommandText = @"
                     CREATE TABLE IF NOT EXISTS Products (
                         ProductID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,7 +33,7 @@ namespace MarketStockTracking
                 // Stores tablosu
                 cmd.CommandText = @"
                     CREATE TABLE IF NOT EXISTS Stores (
-                        StoreID  INTEGER PRIMARY KEY AUTOINCREMENT,
+                        StoreID INTEGER PRIMARY KEY AUTOINCREMENT,
                         StoreName TEXT NOT NULL,
                         StoreDate TEXT
                     )";
@@ -56,6 +53,43 @@ namespace MarketStockTracking
                         Debt REAL,
                         CreatedDate TEXT
                     )";
+                cmd.ExecuteNonQuery();
+
+                // Settings tablosu
+                cmd.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS Settings (
+                        Key TEXT PRIMARY KEY,
+                        Value TEXT
+                    )";
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public static string GetSetting(string key, string defaultValue = "")
+        {
+            using (var conn = new SqliteConnection(ConnectionString))
+            {
+                conn.Open();
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT Value FROM Settings WHERE Key = @key";
+                cmd.Parameters.AddWithValue("@key", key);
+
+                var result = cmd.ExecuteScalar();
+                return result != null ? result.ToString() : defaultValue;
+            }
+        }
+
+        public static void SetSetting(string key, string value)
+        {
+            using (var conn = new SqliteConnection(ConnectionString))
+            {
+                conn.Open();
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = @"
+                    INSERT INTO Settings (Key, Value) VALUES (@key, @value)
+                    ON CONFLICT(Key) DO UPDATE SET Value = @value";
+                cmd.Parameters.AddWithValue("@key", key);
+                cmd.Parameters.AddWithValue("@value", value);
                 cmd.ExecuteNonQuery();
             }
         }

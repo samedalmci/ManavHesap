@@ -12,18 +12,22 @@ namespace MarketStockTracking
         // Türk kültür ayarlarını kullanıyoruz
         private readonly CultureInfo trCulture = new CultureInfo("tr-TR");
 
-        // Fişte kullanılacak veriler (Tek bir satış kaydı için)
-        public string IsletmeAdi { get; set; } = "Yeşillikçi Mustafa";
-        public string Adres { get; set; } = "Muğla Ula";
-        public string Telefon { get; set; } = "0537 065 42 35"; 
-        public string Sehir { get; set; } = "Muğla";
-        public string YaziciAdi { get; set; } = "Printer POS-80"; // Varsayılan Yazıcınızın Windows'taki Adı
-
+        // Fişte kullanılacak veriler (Tek bir satış kaydı için)   
+     
+       
         // Satışa ait temel veriler
         public DateTime SatisTarihi { get; set; }
         public int SatisNo { get; set; } = 1; // Eğer veritabanından ID alınıyorsa buraya atanmalı
-        public string Kasiyer { get; set; } = "Mustafa Şimşek "; // Varsayılan Kasiyer
-                                                              
+     
+
+
+        public string IsletmeAdi { get; set; }
+        public string Adres { get; set; }
+        public string Telefon { get; set; }
+        public string Sehir { get; set; }
+        public string YaziciAdi { get; set; }
+        public string Kasiyer { get; set; }
+
         public List<Sale> Satislar { get; set; }
         public decimal ToplamTutar { get; set; }
         public string MagzaAdi { get; set; }
@@ -35,6 +39,15 @@ namespace MarketStockTracking
 
         public ReceiptPrinter(BindingList<Sale> satislar)
         {
+            // Ayarları DB'den yükle
+            this.IsletmeAdi = DatabaseHelper.GetSetting("IsletmeAdi", "İşletme Adı");
+            this.Adres = DatabaseHelper.GetSetting("Adres", "Adres");
+            this.Telefon = DatabaseHelper.GetSetting("Telefon", "Telefon");
+            this.Sehir = DatabaseHelper.GetSetting("Sehir", "Şehir");
+            this.YaziciAdi = DatabaseHelper.GetSetting("YaziciAdi", "Microsoft Print to PDF");
+            this.Kasiyer = DatabaseHelper.GetSetting("Kasiyer", "Kasiyer");
+
+
             this.SatisTarihi = DateTime.Now;
             this.Satislar = new List<Sale>(satislar);
 

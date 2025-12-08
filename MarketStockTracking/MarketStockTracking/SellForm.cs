@@ -33,6 +33,9 @@ namespace MarketStockTracking
             txtMagza.Items.Clear();
             txtMagza.Items.Add("Seçiniz...");
             txtMagza.SelectedIndex = 0;
+
+
+
         }
 
         private void SellForm_Load(object sender, EventArgs e)
@@ -58,6 +61,8 @@ namespace MarketStockTracking
             MagazalariYukle();
 
             dgvUrunler.DataSource = temporarySales;
+
+            SutunlariTurkcele();
         }
 
         private void UrunleriYukle()
@@ -248,6 +253,53 @@ namespace MarketStockTracking
             txtBorc.ForeColor = kalan > 0 ? Color.Red : Color.Black;
         }
 
+        private void SutunlariTurkcele()
+        {
+            foreach (DataGridViewColumn col in dgvUrunler.Columns)
+            {
+                switch (col.Name)
+                {
+                    case "ProductName":
+                        col.HeaderText = "Ürün Adı";
+                        break;
+                    case "StoreName":
+                        col.HeaderText = "Mağaza";
+                        break;
+                    case "Quantity":
+                        col.HeaderText = "Adet";
+                        col.DefaultCellStyle.Format = "N2";
+                        break;
+                    case "NetPrice":
+                        col.HeaderText = "Net Fiyat";
+                        col.DefaultCellStyle.Format = "N2";
+                        break;
+                    case "GrossPrice":
+                        col.HeaderText = "Alış Fiyatı";
+                        col.DefaultCellStyle.Format = "N2";
+                        break;
+                    case "Profit":
+                        col.HeaderText = "Kar/Zarar";
+                        col.DefaultCellStyle.Format = "N2";
+                        break;
+                    case "CashPaid":
+                        col.HeaderText = "Peşinat";
+                        col.DefaultCellStyle.Format = "N2";
+                        break;
+                    case "Debt":
+                        col.HeaderText = "Borç";
+                        col.DefaultCellStyle.Format = "N2";
+                        break;
+                    case "CreatedDate":
+                        col.HeaderText = "Tarih";
+                        col.DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
+                        break;
+                    case "ID":
+                        col.HeaderText = "ID";
+                        break;
+                }
+            }
+        }
+
         private void SatisUrunler()
         {
             try
@@ -264,47 +316,8 @@ namespace MarketStockTracking
                 }
 
                 dgvUrunler.DataSource = dt;
+                SutunlariTurkcele();
 
-                foreach (DataGridViewColumn col in dgvUrunler.Columns)
-                {
-                    switch (col.Name)
-                    {
-                        case "ProductName":
-                            col.HeaderText = "Ürün Adı";
-                            break;
-                        case "StoreName":
-                            col.HeaderText = "Mağaza";
-                            break;
-                        case "Quantity":
-                            col.HeaderText = "Adet";
-                            col.DefaultCellStyle.Format = "N2";
-                            break;
-                        case "NetPrice":
-                            col.HeaderText = "Net Fiyat";
-                            col.DefaultCellStyle.Format = "N2";
-                            break;
-                        case "GrossPrice":
-                            col.HeaderText = "Alış Fiyatı";
-                            col.DefaultCellStyle.Format = "N2";
-                            break;
-                        case "Profit":
-                            col.HeaderText = "Kar/Zarar";
-                            col.DefaultCellStyle.Format = "N2";
-                            break;
-                        case "CashPaid":
-                            col.HeaderText = "Peşinat";
-                            col.DefaultCellStyle.Format = "N2";
-                            break;
-                        case "Debt":
-                            col.HeaderText = "Borç";
-                            col.DefaultCellStyle.Format = "N2";
-                            break;
-                        case "CreatedDate":
-                            col.HeaderText = "Tarih";
-                            col.DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
-                            break;
-                    }
-                }
             }
             finally
             {
@@ -426,6 +439,7 @@ namespace MarketStockTracking
         {
             dgvUrunler.DataSource = temporarySales;
             guncelUrunlerGoruntusunde = true;
+            SutunlariTurkcele();
         }
 
         private void button2_Click(object sender, EventArgs e)
