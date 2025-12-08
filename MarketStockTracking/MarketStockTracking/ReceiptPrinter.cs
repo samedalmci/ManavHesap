@@ -90,20 +90,26 @@ namespace MarketStockTracking
             PrintDocument pd = new PrintDocument();
             pd.PrintPage += new PrintPageEventHandler(this.pd_PrintPage);
 
-            // Gerçek Yazıcı Kullanımı için (Yukarıdaki satırı yorum satırı yapın):
-
-            try
+            if (!string.IsNullOrWhiteSpace(YaziciAdi))
             {
-                pd.PrinterSettings.PrinterName = YaziciAdi;
-            }
-            catch
-            {
-                System.Windows.Forms.MessageBox.Show($"'{YaziciAdi}' adında bir yazıcı bulunamadı. Varsayılan yazıcıya gönderiliyor.", "Yazıcı Hatası", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                try
+                {
+                    pd.PrinterSettings.PrinterName = YaziciAdi;
+                }
+                catch
+                {
+                    System.Windows.Forms.MessageBox.Show($"'{YaziciAdi}' adında bir yazıcı bulunamadı.", "Yazıcı Hatası", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                }
             }
 
+            // Kağıt yüksekliğini içeriğe göre hesapla
+            int sabitSatirlar = 18; // İşletme bilgileri, tarih, toplam vs.
+            int urunSatirlari = Satislar.Count * 2; // Her ürün 2 satır
+            int toplamSatir = sabitSatirlar + urunSatirlari;
+            int kagitYuksekligi = toplamSatir * 20; // Her satır ~20 piksel
 
-            pd.DefaultPageSettings.PaperSize = new PaperSize("80mm Receipt", 315, 1169); // Genişlik: 80mm
-            pd.DefaultPageSettings.Margins = new Margins(5, 5, 5, 5); // Kenar boşluklarını azalt
+            pd.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 315, kagitYuksekligi);
+            pd.DefaultPageSettings.Margins = new Margins(5, 5, 5, 5);
 
             pd.Print();
         }
