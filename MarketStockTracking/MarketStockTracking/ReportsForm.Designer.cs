@@ -144,6 +144,7 @@
             Controls.Add(dtpEnd);
             Controls.Add(dtpStart);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MinimumSize = new Size(770, 591);
             Name = "ReportsForm";
             Text = "Yeşillikçi Mustafa Rapor";
             ((System.ComponentModel.ISupportInitialize)dgvReport).EndInit();

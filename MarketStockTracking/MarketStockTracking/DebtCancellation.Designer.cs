@@ -44,27 +44,33 @@
             // 
             // txtMagza
             // 
+            txtMagza.Anchor = AnchorStyles.Top;
             txtMagza.FormattingEnabled = true;
-            txtMagza.Location = new Point(57, 49);
+            txtMagza.Location = new Point(102, 49);
             txtMagza.Name = "txtMagza";
             txtMagza.Size = new Size(121, 23);
             txtMagza.TabIndex = 0;
             // 
             // dgvBorclar
             // 
+            dgvBorclar.AllowUserToAddRows = false;
+            dgvBorclar.AllowUserToDeleteRows = false;
+            dgvBorclar.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvBorclar.BackgroundColor = SystemColors.MenuBar;
             dgvBorclar.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvBorclar.Location = new Point(57, 138);
+            dgvBorclar.Location = new Point(56, 149);
             dgvBorclar.Name = "dgvBorclar";
-            dgvBorclar.Size = new Size(420, 224);
+            dgvBorclar.ReadOnly = true;
+            dgvBorclar.Size = new Size(624, 324);
             dgvBorclar.TabIndex = 1;
             // 
             // button1
             // 
+            button1.Anchor = AnchorStyles.Top;
             button1.ForeColor = Color.DarkGreen;
-            button1.Location = new Point(501, 177);
+            button1.Location = new Point(545, 112);
             button1.Name = "button1";
-            button1.Size = new Size(102, 91);
+            button1.Size = new Size(135, 31);
             button1.TabIndex = 2;
             button1.Text = "Borcu Öde";
             button1.UseVisualStyleBackColor = true;
@@ -72,22 +78,25 @@
             // 
             // txtOdenenMiktar
             // 
-            txtOdenenMiktar.Location = new Point(286, 49);
+            txtOdenenMiktar.Anchor = AnchorStyles.Top;
+            txtOdenenMiktar.Location = new Point(331, 49);
             txtOdenenMiktar.Name = "txtOdenenMiktar";
             txtOdenenMiktar.Size = new Size(122, 23);
             txtOdenenMiktar.TabIndex = 3;
             // 
             // txtKalanBorc
             // 
-            txtKalanBorc.Location = new Point(501, 49);
+            txtKalanBorc.Anchor = AnchorStyles.Top;
+            txtKalanBorc.Location = new Point(580, 50);
             txtKalanBorc.Name = "txtKalanBorc";
             txtKalanBorc.Size = new Size(100, 23);
             txtKalanBorc.TabIndex = 4;
             // 
             // label1
             // 
+            label1.Anchor = AnchorStyles.Top;
             label1.AutoSize = true;
-            label1.Location = new Point(57, 27);
+            label1.Location = new Point(102, 27);
             label1.Name = "label1";
             label1.Size = new Size(73, 15);
             label1.TabIndex = 5;
@@ -95,8 +104,9 @@
             // 
             // label2
             // 
+            label2.Anchor = AnchorStyles.Top;
             label2.AutoSize = true;
-            label2.Location = new Point(286, 27);
+            label2.Location = new Point(331, 27);
             label2.Name = "label2";
             label2.Size = new Size(101, 15);
             label2.TabIndex = 6;
@@ -104,8 +114,9 @@
             // 
             // label3
             // 
+            label3.Anchor = AnchorStyles.Top;
             label3.AutoSize = true;
-            label3.Location = new Point(501, 27);
+            label3.Location = new Point(580, 28);
             label3.Name = "label3";
             label3.Size = new Size(63, 15);
             label3.TabIndex = 7;
@@ -113,8 +124,9 @@
             // 
             // btnExportExcel
             // 
+            btnExportExcel.Anchor = AnchorStyles.Top;
             btnExportExcel.ForeColor = Color.DarkGreen;
-            btnExportExcel.Location = new Point(360, 101);
+            btnExportExcel.Location = new Point(46, 112);
             btnExportExcel.Name = "btnExportExcel";
             btnExportExcel.Size = new Size(117, 31);
             btnExportExcel.TabIndex = 8;
@@ -127,7 +139,7 @@
             button2.Anchor = AnchorStyles.Top;
             button2.Font = new Font("Segoe MDL2 Assets", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button2.ForeColor = Color.DarkRed;
-            button2.Location = new Point(449, 50);
+            button2.Location = new Point(496, 49);
             button2.Name = "button2";
             button2.Size = new Size(46, 22);
             button2.TabIndex = 27;
@@ -139,7 +151,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(650, 407);
+            ClientSize = new Size(739, 512);
             Controls.Add(button2);
             Controls.Add(btnExportExcel);
             Controls.Add(label3);
@@ -150,9 +162,8 @@
             Controls.Add(button1);
             Controls.Add(dgvBorclar);
             Controls.Add(txtMagza);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MaximizeBox = false;
+            MinimumSize = new Size(664, 450);
             Name = "DebtCancellation";
             Text = "Yeşillikçi Mustafa Borç Ödeme";
             ((System.ComponentModel.ISupportInitialize)dgvBorclar).EndInit();
