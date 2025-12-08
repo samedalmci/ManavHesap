@@ -106,7 +106,7 @@ namespace MarketStockTracking
             int sabitSatirlar = 18;
             int urunSatirlari = Satislar.Count * 2;
             int toplamSatir = sabitSatirlar + urunSatirlari;
-            int altBosluk = 100; // Parmak kadar boşluk
+            int altBosluk = 200; // Parmak kadar boşluk
             int kagitYuksekligi = (toplamSatir * 20) + altBosluk;
 
             pd.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 315, kagitYuksekligi);

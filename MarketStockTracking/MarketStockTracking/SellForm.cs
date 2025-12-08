@@ -167,6 +167,23 @@ namespace MarketStockTracking
                 if (txtMagza.SelectedIndex == 0) { MessageBox.Show("Lütfen mağaza seçin."); return; }
                 if (string.IsNullOrWhiteSpace(txtAdet.Text)) { MessageBox.Show("Lütfen adet girin."); return; }
 
+                // Mağaza kontrolü - sepette ürün varsa ve farklı mağazaysa uyar
+                if (temporarySales.Count > 0 && temporarySales[0].StoreName != txtMagza.Text)
+                {
+                    DialogResult dr = MessageBox.Show(
+                        $"Sepette '{temporarySales[0].StoreName}' mağazasına ait ürünler var.\n" +
+                        $"'{txtMagza.Text}' mağazasından ürün eklemek istediğinize emin misiniz?\n\n" +
+                        "Evet: Sepet temizlenip yeni mağaza ile devam edilir.\n" +
+                        "Hayır: İşlem iptal edilir.",
+                        "Farklı Mağaza Uyarısı", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
+                    );
+
+                    if (dr == DialogResult.No) return;
+
+                    // Evet derse sepeti temizle
+                    temporarySales.Clear();
+                }
+
                 decimal adet = decimal.TryParse(txtAdet.Text, out decimal a) ? a : 0;
                 decimal net = ParseCurrencyInput(txtNet.Text);
                 decimal brut = ParseCurrencyInput(txtBrut.Text);
@@ -206,7 +223,10 @@ namespace MarketStockTracking
 
                 temporarySales.Add(sale);
                 MessageBox.Show("Ürün listeye eklendi.");
+
+                string mevcutMagaza = txtMagza.Text;
                 CleanForm();
+                txtMagza.Text = mevcutMagaza;
             }
             catch (Exception ex)
             {
@@ -215,6 +235,7 @@ namespace MarketStockTracking
             finally
             {
                 dgvUrunler.DataSource = temporarySales;
+                SutunlariTurkcele();
             }
         }
 
@@ -416,6 +437,8 @@ namespace MarketStockTracking
                 return;
             }
 
+            
+
             SqlSalesRepository repo = new SqlSalesRepository(baglanti);
 
             foreach (Sale sale in temporarySales)
@@ -427,6 +450,9 @@ namespace MarketStockTracking
             ReceiptPrinter printer = new ReceiptPrinter(temporarySales);
             printer.Bas();
             temporarySales.Clear();
+
+            CleanForm();  // ← EKLE
+            txtMagza.SelectedIndex = 0;
         }
 
         private void btnSatisGecmisi_Click(object sender, EventArgs e)
