@@ -106,7 +106,7 @@ namespace MarketStockTracking
             int sabitSatirlar = 18;
             int urunSatirlari = Satislar.Count * 2;
             int toplamSatir = sabitSatirlar + urunSatirlari;
-            int altBosluk = 200; // Parmak kadar boşluk
+            int altBosluk = 50; // Parmak kadar boşluk
             int kagitYuksekligi = (toplamSatir * 20) + altBosluk;
 
             pd.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 315, kagitYuksekligi);
@@ -245,6 +245,9 @@ namespace MarketStockTracking
             // 6. Mağza İsmi
             g.DrawString($"Mağza Adı : {MagzaAdi}", fontNormal, Brushes.Black, leftMargin, y);
             y += lineHeight;
+           
+            y += 100; // Alt boşluk (parmak kadar)
+            g.DrawString(" ", fontNormal, Brushes.Black, 0, y); // Görünmez karakter
 
             e.HasMorePages = false; // Yazdırmanın bittiğini belirtir
         }
