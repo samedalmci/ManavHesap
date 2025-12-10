@@ -447,8 +447,13 @@ namespace MarketStockTracking
             }
 
             MessageBox.Show("Tüm satışlar kaydedildi.");
-            ReceiptPrinter printer = new ReceiptPrinter(temporarySales);
-            printer.Bas();
+
+            DialogResult fisDr = MessageBox.Show("Fiş yazdırılsın mı?", "Fiş", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (fisDr == DialogResult.Yes)
+            {
+                ReceiptPrinter printer = new ReceiptPrinter(temporarySales);
+                printer.Bas();
+            }
             temporarySales.Clear();
 
             CleanForm();  // ← EKLE

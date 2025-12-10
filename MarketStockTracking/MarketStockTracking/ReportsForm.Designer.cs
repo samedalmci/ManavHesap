@@ -65,7 +65,6 @@
             btnAdet.TabIndex = 2;
             btnAdet.Text = "Adet";
             btnAdet.UseVisualStyleBackColor = true;
-            btnAdet.Click += btnAdet_Click;
             // 
             // btnBorc
             // 

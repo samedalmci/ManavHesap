@@ -39,6 +39,7 @@
             label3 = new Label();
             btnExportExcel = new Button();
             button2 = new Button();
+            lblSecimBilgi = new Label();
             ((System.ComponentModel.ISupportInitialize)dgvBorclar).BeginInit();
             SuspendLayout();
             // 
@@ -147,11 +148,21 @@
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
+            // lblSecimBilgi
+            // 
+            lblSecimBilgi.AutoSize = true;
+            lblSecimBilgi.Location = new Point(196, 112);
+            lblSecimBilgi.Name = "lblSecimBilgi";
+            lblSecimBilgi.Size = new Size(72, 15);
+            lblSecimBilgi.TabIndex = 28;
+            lblSecimBilgi.Text = "X Adet Seçili";
+            // 
             // DebtCancellation
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(739, 512);
+            Controls.Add(lblSecimBilgi);
             Controls.Add(button2);
             Controls.Add(btnExportExcel);
             Controls.Add(label3);
@@ -183,5 +194,6 @@
         private Label label3;
         private Button btnExportExcel;
         private Button button2;
+        private Label lblSecimBilgi;
     }
 }

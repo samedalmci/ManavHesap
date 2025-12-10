@@ -261,10 +261,5 @@ namespace MarketStockTracking
         {
             ExportToExcel();
         }
-
-        private void btnAdet_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }

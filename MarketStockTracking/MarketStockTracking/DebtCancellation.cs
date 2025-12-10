@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Data.Sqlite;
 using ClosedXML.Excel;
+using MarketStockTracking.Models;
 
 namespace MarketStockTracking
 {
@@ -23,7 +24,8 @@ namespace MarketStockTracking
             InitializeComponent();
 
             txtMagza.SelectedIndexChanged += txtMagza_SelectedIndexChanged;
-            dgvBorclar.CellClick += dgvBorclar_CellClick;
+            dgvBorclar.SelectionChanged += dgvBorclar_SelectionChanged;
+            //dgvBorclar.CellClick += dgvBorclar_CellClick;
 
             txtOdenenMiktar.KeyPress += TxtCurrency_KeyPress;
             txtOdenenMiktar.Leave += TxtCurrency_Leave;
@@ -131,26 +133,90 @@ namespace MarketStockTracking
             }
         }
 
-        private void dgvBorclar_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void dgvBorclar_SelectionChanged(object sender, EventArgs e)
         {
-            if (e.RowIndex < 0) return;
-
-            try
+            if (dgvBorclar.SelectedRows.Count == 0)
             {
-                DataGridViewRow selectedRow = dgvBorclar.Rows[e.RowIndex];
-
-                string magazaAdi = selectedRow.Cells["Magaza"].Value.ToString();
-                string kalanBorcString = selectedRow.Cells["Kalan Borç Tutarı"].Value.ToString();
-
-                txtMagza.Text = magazaAdi;
-                txtKalanBorc.Text = kalanBorcString + " TL";
+                txtKalanBorc.Text = "";
                 txtOdenenMiktar.Text = "";
+                lblSecimBilgi.Text = "";
+                return;
             }
-            catch (Exception ex)
+
+            // Farklı mağaza kontrolü
+            string ilkMagaza = dgvBorclar.SelectedRows[0].Cells["Magaza"].Value?.ToString();
+            bool farkliMagazaVar = false;
+
+            foreach (DataGridViewRow row in dgvBorclar.SelectedRows)
             {
-                MessageBox.Show("Satır seçimi hatası: " + ex.Message);
+                string magaza = row.Cells["Magaza"].Value?.ToString();
+                if (magaza != ilkMagaza)
+                {
+                    farkliMagazaVar = true;
+                    break;
+                }
             }
+
+            if (farkliMagazaVar)
+            {
+                lblSecimBilgi.Text = "⚠️ Farklı mağazalar seçili! Tek mağaza seçin.";
+                lblSecimBilgi.ForeColor = Color.Red;
+                txtKalanBorc.Text = "";
+                txtOdenenMiktar.Text = "";
+                return;
+            }
+
+            // Toplam borcu hesapla
+            decimal toplamBorc = 0;
+            List<string> urunler = new List<string>();
+
+            foreach (DataGridViewRow row in dgvBorclar.SelectedRows)
+            {
+                if (row.Cells["Kalan Borç Tutarı"].Value != null)
+                {
+                    toplamBorc += Convert.ToDecimal(row.Cells["Kalan Borç Tutarı"].Value);
+                }
+                if (row.Cells["UrunAdi"].Value != null)
+                {
+                    urunler.Add(row.Cells["UrunAdi"].Value.ToString());
+                }
+            }
+
+            CultureInfo trCulture = new CultureInfo("tr-TR");
+            txtKalanBorc.Text = toplamBorc.ToString("N2", trCulture) + " TL";
+            txtOdenenMiktar.Text = "";
+
+            if (dgvBorclar.SelectedRows.Count == 1)
+            {
+                lblSecimBilgi.Text = $"1 ürün seçili: {urunler[0]}";
+            }
+            else
+            {
+                lblSecimBilgi.Text = $"{dgvBorclar.SelectedRows.Count} ürün seçili: {string.Join(", ", urunler)}";
+            }
+            lblSecimBilgi.ForeColor = Color.Black;
         }
+
+        //private void dgvBorclar_CellClick(object sender, DataGridViewCellEventArgs e)
+        //{
+        //    if (e.RowIndex < 0) return;
+
+        //    try
+        //    {
+        //        DataGridViewRow selectedRow = dgvBorclar.Rows[e.RowIndex];
+
+        //        string magazaAdi = selectedRow.Cells["Magaza"].Value.ToString();
+        //        string kalanBorcString = selectedRow.Cells["Kalan Borç Tutarı"].Value.ToString();
+
+        //        txtMagza.Text = magazaAdi;
+        //        txtKalanBorc.Text = kalanBorcString + " TL";
+        //        txtOdenenMiktar.Text = "";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Satır seçimi hatası: " + ex.Message);
+        //    }
+        //}
 
         private void TxtCurrency_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -195,22 +261,25 @@ namespace MarketStockTracking
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (txtMagza.SelectedIndex == 0)
-            {
-                MessageBox.Show("Lütfen mağaza seçin.");
-                return;
-            }
-
             if (dgvBorclar.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Lütfen ödeme yapmak istediğiniz satırı seçin.");
+                MessageBox.Show("Lütfen ödeme yapmak istediğiniz satır(lar)ı seçin.");
                 return;
             }
 
-            int selectedRowIndex = dgvBorclar.SelectedRows[0].Index;
-            int satisID = Convert.ToInt32(dgvBorclar.Rows[selectedRowIndex].Cells["ID"].Value);
+            // Farklı mağaza kontrolü
+            string ilkMagaza = dgvBorclar.SelectedRows[0].Cells["Magaza"].Value?.ToString();
+            foreach (DataGridViewRow row in dgvBorclar.SelectedRows)
+            {
+                if (row.Cells["Magaza"].Value?.ToString() != ilkMagaza)
+                {
+                    MessageBox.Show("Farklı mağazalardan ürün seçemezsiniz!\nLütfen tek bir mağazanın ürünlerini seçin.",
+                        "Mağaza Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
 
-            decimal kalanBorc = ParseCurrencyInput(txtKalanBorc.Text);
+            decimal toplamBorc = ParseCurrencyInput(txtKalanBorc.Text);
             decimal odenenMiktar = ParseCurrencyInput(txtOdenenMiktar.Text);
 
             if (odenenMiktar <= 0)
@@ -219,36 +288,72 @@ namespace MarketStockTracking
                 return;
             }
 
-            if (odenenMiktar > kalanBorc)
+            if (odenenMiktar > toplamBorc)
             {
                 DialogResult dr = MessageBox.Show(
-                    $"Girilen {odenenMiktar.ToString("N2", new CultureInfo("tr-TR"))} TL miktarı, kalan borç olan {kalanBorc.ToString("N2", new CultureInfo("tr-TR"))} TL'den fazladır.\nBorç sıfırlanacak. Yine de devam etmek istiyor musunuz?",
+                    $"Girilen miktar toplam borçtan fazla.\nToplam borç sıfırlanacak. Devam etmek istiyor musunuz?",
                     "Miktar Uyarısı", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
                 );
                 if (dr == DialogResult.No) return;
+                odenenMiktar = toplamBorc;
             }
 
-            decimal yeniBorc = Math.Max(0, kalanBorc - odenenMiktar);
+            // Seçili satırların bilgilerini topla (fiş için)
+            List<DebtPaymentInfo> odemeBilgileri = new List<DebtPaymentInfo>();
+            decimal kalanOdeme = odenenMiktar;
 
             try
             {
                 if (conn.State == ConnectionState.Closed) conn.Open();
 
-                string updateQuery = "UPDATE Sales SET CashPaid = CashPaid + @OdenenMiktar, Debt = @YeniBorc WHERE ID = @SatisID";
-                var cmd = new SqliteCommand(updateQuery, conn);
-                cmd.Parameters.AddWithValue("@OdenenMiktar", odenenMiktar);
-                cmd.Parameters.AddWithValue("@YeniBorc", yeniBorc);
-                cmd.Parameters.AddWithValue("@SatisID", satisID);
-
-                int affectedRows = cmd.ExecuteNonQuery();
-
-                if (affectedRows > 0)
+                foreach (DataGridViewRow row in dgvBorclar.SelectedRows)
                 {
-                    MessageBox.Show($"Ödeme başarıyla alındı. Yeni Kalan Borç: {yeniBorc.ToString("N2", new CultureInfo("tr-TR"))} TL", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoadDebts();
-                    txtKalanBorc.Text = "";
-                    txtOdenenMiktar.Text = "";
+                    if (kalanOdeme <= 0) break;
+
+                    int satisID = Convert.ToInt32(row.Cells["ID"].Value);
+                    decimal satirBorc = Convert.ToDecimal(row.Cells["Kalan Borç Tutarı"].Value);
+                    string urunAdi = row.Cells["UrunAdi"].Value.ToString();
+                    string magaza = row.Cells["Magaza"].Value.ToString();
+
+                    decimal buSatiraOdenen = Math.Min(kalanOdeme, satirBorc);
+                    decimal yeniBorc = satirBorc - buSatiraOdenen;
+
+                    string updateQuery = "UPDATE Sales SET CashPaid = CashPaid + @OdenenMiktar, Debt = @YeniBorc WHERE ID = @SatisID";
+                    var cmd = new SqliteCommand(updateQuery, conn);
+                    cmd.Parameters.AddWithValue("@OdenenMiktar", buSatiraOdenen);
+                    cmd.Parameters.AddWithValue("@YeniBorc", yeniBorc);
+                    cmd.Parameters.AddWithValue("@SatisID", satisID);
+                    cmd.ExecuteNonQuery();
+
+                    odemeBilgileri.Add(new DebtPaymentInfo
+                    {
+                        UrunAdi = urunAdi,
+                        MagazaAdi = magaza,
+                        EskiBorc = satirBorc,
+                        OdenenMiktar = buSatiraOdenen,
+                        YeniBorc = yeniBorc
+                    });
+
+                    kalanOdeme -= buSatiraOdenen;
                 }
+
+                MessageBox.Show("Ödeme başarıyla alındı.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Fiş bas
+                if (odemeBilgileri.Count > 0)
+                {
+                    DialogResult fisDr = MessageBox.Show("Fiş yazdırılsın mı?", "Fiş", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (fisDr == DialogResult.Yes)
+                    {
+                        DebtReceiptPrinter printer = new DebtReceiptPrinter(odemeBilgileri);
+                        printer.Bas();
+                    }
+                }
+
+                LoadDebts();
+                txtKalanBorc.Text = "";
+                txtOdenenMiktar.Text = "";
+                lblSecimBilgi.Text = "";
             }
             catch (Exception ex)
             {

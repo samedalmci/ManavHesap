@@ -18,9 +18,9 @@ namespace MarketStockTracking
         // Satışa ait temel veriler
         public DateTime SatisTarihi { get; set; }
         public int SatisNo { get; set; } = 1; // Eğer veritabanından ID alınıyorsa buraya atanmalı
-     
 
-
+        public decimal MagazaToplamBorc { get; set; }
+        public decimal MagazaToplamOdenen { get; set; }
         public string IsletmeAdi { get; set; }
         public string Adres { get; set; }
         public string Telefon { get; set; }
@@ -83,6 +83,34 @@ namespace MarketStockTracking
             {
                 this.ParaUstu = 0;
             }
+
+            if (!string.IsNullOrEmpty(this.MagzaAdi))
+            {
+                using (var conn = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseHelper.ConnectionString))
+                {
+                    conn.Open();
+                    var cmd = conn.CreateCommand();
+                    cmd.CommandText = @"SELECT 
+                                    COALESCE(SUM(Debt), 0) AS ToplamBorc,
+                                    COALESCE(SUM(CashPaid), 0) AS ToplamOdenen
+                                FROM Sales 
+                                WHERE StoreName = @magaza";
+                    cmd.Parameters.AddWithValue("@magaza", this.MagzaAdi);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            this.MagazaToplamBorc = reader.GetDecimal(0);
+                            this.MagazaToplamOdenen = reader.GetDecimal(1);
+                        }
+                    }
+                }
+
+                // Güncel satışı da ekle (henüz DB'ye kaydedilmedi)
+                this.MagazaToplamBorc += this.Borc;
+                this.MagazaToplamOdenen += this.AlinanPara;
+            }
         }
 
         public void Bas()
@@ -103,7 +131,7 @@ namespace MarketStockTracking
             }
 
             // Kağıt yüksekliğini içeriğe göre hesapla
-            int sabitSatirlar = 18;
+            int sabitSatirlar = 24;
             int urunSatirlari = Satislar.Count * 2;
             int toplamSatir = sabitSatirlar + urunSatirlari;
             int altBosluk = 50; // Parmak kadar boşluk
@@ -120,12 +148,9 @@ namespace MarketStockTracking
 
         private void pd_PrintPage(object sender, PrintPageEventArgs e)
         {
-            // Genellikle 80mm yazıcılar 3.125 inç genişliğindedir (~79.3mm). 
-            // 1 inç = 100 piksel varsayarak, bu yazıcılar için maksimum genişlik 300-310 civarıdır. 
-            // Biz burada sadece başlangıç X pozisyonu (0) ve Y pozisyonunu kullanacağız.
             Graphics g = e.Graphics;
-            int y = 5;
-            int lineHeight = 18; // Satırlar arası boşluk
+            int y = 0;
+            int lineHeight = 18;
 
             // Fiş fontları
             Font fontBaslik = new Font("Arial", 10, FontStyle.Bold);
@@ -136,7 +161,11 @@ namespace MarketStockTracking
 
             // Hizalama formatı
             StringFormat rightAlign = new StringFormat();
-            rightAlign.Alignment = StringAlignment.Far; // Sağa hizalama
+            rightAlign.Alignment = StringAlignment.Far;
+
+            // Margin'ler - ÖNCELİKLE TANIMLA
+            int leftMargin = 5;
+            int rightMargin = e.PageBounds.Width - 5;
 
             // ----------------------------------------------------
             // 1. İŞLETME BİLGİLERİ (Ortalanmış)
@@ -162,15 +191,22 @@ namespace MarketStockTracking
             y += lineHeight;
 
             // ----------------------------------------------------
-            // 2. SATIŞ BİLGİLERİ (İki Yana Yaslı)
+            // 2. SATIŞ FİŞİ BAŞLIĞI
             // ----------------------------------------------------
-            int leftMargin = 5;
-            int rightMargin = e.PageBounds.Width - 5;
-            int midPoint = e.PageBounds.Width / 2;
+            g.DrawString("-----------------------------------------", fontNormal, Brushes.Black, leftMargin, y);
+            y += lineHeight;
+
+            size = g.MeasureString("SATIŞ BİLGİ FİŞİ", fontToplam);
+            startX = (e.PageBounds.Width / 2) - (size.Width / 2);
+            g.DrawString("SATIŞ BİLGİ FİŞİ", fontToplam, Brushes.Black, startX, y);
+            y += lineHeight;
 
             g.DrawString("-----------------------------------------", fontNormal, Brushes.Black, leftMargin, y);
             y += lineHeight;
 
+            // ----------------------------------------------------
+            // 3. TARİH VE KASİYER BİLGİLERİ
+            // ----------------------------------------------------
             g.DrawString($"TARİH : {SatisTarihi.ToString("dd.MM.yyyy")}", fontNormal, Brushes.Black, leftMargin, y);
             g.DrawString($"SAAT : {SatisTarihi.ToString("HH:mm")}", fontNormal, Brushes.Black, rightMargin, y, rightAlign);
             y += lineHeight;
@@ -186,8 +222,12 @@ namespace MarketStockTracking
             y += lineHeight;
 
             // ----------------------------------------------------
-            // 3. ÜRÜNLER (Görseldeki Formata Yakın)
+            // 4. SEÇİLİ ÜRÜNLER
             // ----------------------------------------------------
+            size = g.MeasureString("SEÇİLİ ÜRÜNLER", fontUrun);
+            startX = (e.PageBounds.Width / 2) - (size.Width / 2);
+            g.DrawString("SEÇİLİ ÜRÜNLER", fontUrun, Brushes.Black, startX, y);
+            y += lineHeight;
 
             foreach (Sale sale in Satislar)
             {
@@ -202,33 +242,27 @@ namespace MarketStockTracking
                 y += lineHeight;
             }
 
-
             // ----------------------------------------------------
-            // 4. TOPLAM VE ÖDEME BİLGİLERİ
+            // 5. TOPLAM VE ÖDEME BİLGİLERİ
             // ----------------------------------------------------
-
             g.DrawString("-----------------------------------------", fontNormal, Brushes.Black, leftMargin, y);
             y += lineHeight;
 
-            // Genel Toplam
-            g.DrawString("GENEL TOPLAM", fontToplam, Brushes.Black, leftMargin, y);
+            g.DrawString("BU ALIŞVERİŞ", fontToplam, Brushes.Black, leftMargin, y);
             g.DrawString(ToplamTutar.ToString("N2", trCulture), fontToplam, Brushes.Black, rightMargin, y, rightAlign);
             y += lineHeight * 2;
 
-            // Alınan Para / Peşinat
-            g.DrawString("ALINAN PARA", fontNormal, Brushes.Black, leftMargin, y);
+            g.DrawString("ÖDENEN", fontNormal, Brushes.Black, leftMargin, y);
             g.DrawString(AlinanPara.ToString("N2", trCulture), fontNormal, Brushes.Black, rightMargin, y, rightAlign);
             y += lineHeight;
 
-            // Para Üstü
             g.DrawString("PARA ÜSTÜ", fontNormal, Brushes.Black, leftMargin, y);
             g.DrawString(ParaUstu.ToString("N2", trCulture), fontNormal, Brushes.Black, rightMargin, y, rightAlign);
             y += lineHeight;
 
-            // Borç (Eğer Borç varsa göster)
             if (Borc > 0)
             {
-                g.DrawString("Kalan Borç", fontToplam, Brushes.Black, leftMargin, y);
+                g.DrawString("KALAN BORÇ", fontToplam, Brushes.Black, leftMargin, y);
                 g.DrawString(Borc.ToString("N2", trCulture), fontToplam, Brushes.Black, rightMargin, y, rightAlign);
                 y += lineHeight;
             }
@@ -236,20 +270,45 @@ namespace MarketStockTracking
             g.DrawString("-----------------------------------------", fontNormal, Brushes.Black, leftMargin, y);
             y += lineHeight;
 
-            // 5. SON NOT
+            // ----------------------------------------------------
+            // 7. MAĞAZA BİLGİLERİ
+            // ----------------------------------------------------
+            size = g.MeasureString("MAĞAZA BİLGİLERİ", fontToplam);
+            startX = (e.PageBounds.Width / 2) - (size.Width / 2);
+            g.DrawString("MAĞAZA BİLGİLERİ", fontToplam, Brushes.Black, startX, y);
+            y += lineHeight;
+
+            g.DrawString($"Mağaza: {MagzaAdi}", fontNormal, Brushes.Black, leftMargin, y);
+            y += lineHeight;
+
+            // Toplam Borç (Mağazanın ödemesi gereken toplam tutar)
+            decimal magazaToplamTutar = MagazaToplamOdenen + MagazaToplamBorc;
+            g.DrawString("Toplam Borç:", fontNormal, Brushes.Black, leftMargin, y);
+            g.DrawString(magazaToplamTutar.ToString("N2", trCulture), fontNormal, Brushes.Black, rightMargin, y, rightAlign);
+            y += lineHeight;
+
+            g.DrawString("Toplam Ödenen:", fontNormal, Brushes.Black, leftMargin, y);
+            g.DrawString(MagazaToplamOdenen.ToString("N2", trCulture), fontNormal, Brushes.Black, rightMargin, y, rightAlign);
+            y += lineHeight;
+
+            g.DrawString("Kalan Borç:", fontToplam, Brushes.Black, leftMargin, y);
+            g.DrawString(MagazaToplamBorc.ToString("N2", trCulture), fontToplam, Brushes.Black, rightMargin, y, rightAlign);
+            y += lineHeight;
+
+            g.DrawString("-----------------------------------------", fontNormal, Brushes.Black, leftMargin, y);
+            y += lineHeight;
+
+            // 6. KDV NOTU
             size = g.MeasureString("KDV FİŞİ DEĞİLDİR", fontNormal);
             startX = (e.PageBounds.Width / 2) - (size.Width / 2);
             g.DrawString("KDV FİŞİ DEĞİLDİR", fontNormal, Brushes.Black, startX, y);
             y += lineHeight;
 
-            // 6. Mağza İsmi
-            g.DrawString($"Mağza Adı : {MagzaAdi}", fontNormal, Brushes.Black, leftMargin, y);
-            y += lineHeight;
-           
-            y += 100; // Alt boşluk (parmak kadar)
-            g.DrawString(" ", fontNormal, Brushes.Black, 0, y); // Görünmez karakter
+            // Alt boşluk
+            y += 30;
+            g.DrawString("-----------------------------------------", fontNormal, Brushes.Black, leftMargin, y);
 
-            e.HasMorePages = false; // Yazdırmanın bittiğini belirtir
+            e.HasMorePages = false;
         }
     }
 }
